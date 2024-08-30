@@ -7,8 +7,8 @@ import Footer from "./components/Footer";
 const jost = Jost({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Coffee Shop",
-  description: "COffee Shop",
+  title: "Deluxe",
+  description: "Deluxe shop",
 };
 
 export default function RootLayout({
