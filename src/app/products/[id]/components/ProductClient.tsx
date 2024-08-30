@@ -1,0 +1,87 @@
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { CircleArrowLeft } from "lucide-react";
+import { Product, ProductImage } from "@/types";
+import Link from "next/link";
+
+interface Props {
+  product: Product;
+}
+
+export default function ProductClient({ product }: Props) {
+  return (
+    <div className="container">
+      <Link href="/">
+        <button className="flex items-center mb-2">
+          <CircleArrowLeft className="w-4 h-4 mr-2" /> Back
+        </button>
+      </Link>
+      <div className="grid md:grid-cols-2 gap-4 lg:gap-12">
+        <div className="relative overflow-hidden rounded-lg">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {product.images.map((image: ProductImage) => (
+                <CarouselItem
+                  key={image.id}
+                  className="relative h-[400px] md:h-[600px]"
+                >
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    className="object-cover"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2" />
+            <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />
+          </Carousel>
+        </div>
+        {/* Product Details Section */}
+        <div className="grid gap-2 md:gap-10 order-1 md:order-2">
+          <div className="flex flex-col">
+            <div className="grid gap-4 md:gap-11">
+              <h1 className="font-bold text-2xl sm:text-3xl">{product.name}</h1>
+              <p className="text-sm">{product.description}</p>
+              <div className="flex flex-wrap">
+                <Label className="text-xl mr-3">Color</Label>
+                <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:outline-none"></button>
+                <button className="border-2 border-gray-300 ml-1 bg-gray-700 rounded-full w-6 h-6 focus:outline-none"></button>
+                <button className="border-2 border-gray-300 ml-1 bg-red-500 rounded-full w-6 h-6 focus:outline-none"></button>
+              </div>
+              <div className="flex">
+                <Badge
+                  className={`${
+                    product.status === "Available"
+                      ? "bg-green-800"
+                      : "bg-red-500"
+                  }`}
+                >
+                  {product.status}
+                </Badge>
+              </div>
+              <Separator />
+              <div className="flex">
+                <Label className="text-xl">
+                  price: <span>$ {product.price}</span>
+                </Label>
+                <Label className="text-xl ml-10"></Label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
