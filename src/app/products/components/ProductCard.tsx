@@ -13,7 +13,7 @@ export function ProductCard({ product }: Props) {
   return (
     <Card className="w-full overflow-hidden rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
       <div className="relative w-full h-[300px]">
-        <Link href={`/products/${product.id}`} scroll={false}>
+        <Link href={`/products/${product.id}`}>
           <Image
             src={product.images[0].src}
             alt={product.images[0].alt}
