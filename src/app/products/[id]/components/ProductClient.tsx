@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -9,10 +11,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
-import { CircleArrowLeft } from "lucide-react";
 import { Product, ProductImage } from "@/types";
-import Link from "next/link";
+import BackButton from "@/components/BackButton";
 
 interface Props {
   product: Product;
@@ -21,11 +21,7 @@ interface Props {
 export default function ProductClient({ product }: Props) {
   return (
     <div className="container">
-      <Link href="/">
-        <button className="flex items-center mb-2">
-          <CircleArrowLeft className="w-4 h-4 mr-2" /> Back
-        </button>
-      </Link>
+      <BackButton text="Back" />
       <div className="grid md:grid-cols-2 gap-4 lg:gap-12">
         <div className="relative overflow-hidden rounded-lg">
           <Carousel className="w-full">
