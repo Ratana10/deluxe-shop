@@ -11,16 +11,13 @@ export default function Footer() {
 
         <div className="mb-4 sm:mb-0 sm:w-1/3 text-center">
           <p className="text-sm">
-            © Copyright 2023 Website. All Rights Reserved.
+            © Copyright 2024. All Rights Reserved.
           </p>
         </div>
 
         <div className="flex space-x-4 sm:w-1/3 justify-center sm:justify-end">
-          <Link href="https://facebook.com" aria-label="Facebook">
+          <Link href="https://www.facebook.com/profile.php?id=61561814585184" aria-label="Facebook">
             <Facebook className="w-6 h-6 hover:text-gray-400" />
-          </Link>
-          <Link href="https://twitter.com" aria-label="Twitter">
-            <Twitter className="w-6 h-6 hover:text-gray-400" />
           </Link>
           <Link href="https://instagram.com" aria-label="Instagram">
             <Instagram className="w-6 h-6 hover:text-gray-400" />
