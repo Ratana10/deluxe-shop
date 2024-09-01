@@ -1,13 +1,12 @@
-import { products } from "@/db/products";
 import ProductClient from "./components/ProductClient";
+import { getProductById } from "@/service/product.service";
 
-const ProductIdPage = ({ params }: { params: { id: string } }) => {
-  const product = products.find((product) => product.id === params.id);
+const ProductIdPage = async ({ params }: { params: { id: string } }) => {
+  const product = await getProductById(params.id);
 
   if (!product) {
     return <div>Product not found</div>;
   }
-
   return (
     <>
       <ProductClient product={product} />

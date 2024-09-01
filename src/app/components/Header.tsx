@@ -17,15 +17,18 @@ import { Button } from "@/components/ui/button";
 interface Navbar {
   id: number;
   title: string;
+  href: string;
 }
 const navbars: Navbar[] = [
   {
     id: 1,
     title: "Products",
+    href: "/products",
   },
   {
     id: 2,
     title: "Contact Us",
+    href: "/",
   },
 ];
 
@@ -84,10 +87,10 @@ export default function Header() {
                   <div className="space-y-2 py-6">
                     {navbars.map((nav: Navbar) => (
                       <Link
-                        href="/"
+                        href={nav.href}
                         key={nav.id}
                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                        onClick={() => setOpen(false)} 
+                        onClick={() => setOpen(false)}
                       >
                         {nav.title}
                       </Link>
@@ -103,7 +106,7 @@ export default function Header() {
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
           {navbars.map((nav: Navbar) => (
             <Link
-              href="/"
+              href={nav.href}
               key={nav.id}
               className="text-lg font-medium leading-6 text-gray-900"
             >
