@@ -3,7 +3,7 @@ import Papa from "papaparse";
 
 export const getProducts = async (): Promise<Product[]> => {
   const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`, {
-    cache: "no-cache",
+    cache: "no-store",
   });
 
   if (!res.ok) {
