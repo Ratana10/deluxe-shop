@@ -1,0 +1,4 @@
+- Install the papaparse package to parse CSV data.
+
+npm install papaparse
+npm install --save-dev @types/papaparse

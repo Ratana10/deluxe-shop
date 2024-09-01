@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Product, ProductImage } from "@/types";
+import { Product } from "@/types";
 import BackButton from "@/components/BackButton";
 
 interface Props {
@@ -26,19 +26,21 @@ export default function ProductClient({ product }: Props) {
         <div className="relative overflow-hidden rounded-lg">
           <Carousel className="w-full">
             <CarouselContent>
-              {product.images.map((image: ProductImage) => (
-                <CarouselItem
-                  key={image.id}
-                  className="relative h-[400px] md:h-[600px]"
-                >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    className="object-cover"
-                  />
-                </CarouselItem>
-              ))}
+              {product.images.map((image: string, index: number) => {
+                return (
+                  <CarouselItem
+                    key={index}
+                    className="relative h-[400px] md:h-[600px]"
+                  >
+                    <Image
+                      src={image}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </CarouselItem>
+                );
+              })}
             </CarouselContent>
             <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2" />
             <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />

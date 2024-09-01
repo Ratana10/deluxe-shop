@@ -1,8 +1,3 @@
-export interface ProductImage {
-  id: string;
-  src: string;
-  alt: string;
-}
 
 export interface Product {
   id: string;
@@ -10,7 +5,7 @@ export interface Product {
   description: string;
   price: number;
   status: string;
-  images: ProductImage[];
+  images: string[];
   createdAt: string;
   updatedAt: string; 
 }

@@ -15,8 +15,8 @@ export function ProductCard({ product }: Props) {
       <div className="relative w-full h-[300px]">
         <Link href={`/products/${product.id}`}>
           <Image
-            src={product.images[0].src}
-            alt={product.images[0].alt}
+            src={product.images[0]}
+            alt={product.images[0]}
             fill
             className="rounded-t-lg object-cover"
           />
