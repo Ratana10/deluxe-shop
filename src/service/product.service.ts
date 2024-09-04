@@ -13,9 +13,7 @@ export const getProducts = async (): Promise<Product[]> => {
   }
 
   try {
-    const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`, {
-      cache: "no-store", // No caching on the network level, using in-memory caching instead
-    });
+    const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`);
 
     if (!res.ok) {
       throw new Error(`Failed to fetch data. Status: ${res.statusText}`);
@@ -67,6 +65,7 @@ const parseCSVToProducts = (csvData: string): Promise<Product[]> => {
           name: item.Name?.trim() || "Unnamed Product",
           description: item.Description?.trim() || "No description available",
           price: item.Price ? parseFloat(item.Price) : 0.0,
+          color: item.Color?.trim(),
           status: item.Status?.trim() || "Unavailable",
           images: item.Images
             ? item.Images.split(",")

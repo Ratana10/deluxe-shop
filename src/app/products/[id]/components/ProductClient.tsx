@@ -14,11 +14,21 @@ import {
 import { Product } from "@/types";
 import BackButton from "@/components/BackButton";
 
+// Define a color map
+const colorMap: { [key: string]: string } = {
+  Gold: "#D4AF37", // HEX for metallic gold
+  Silver: "#C0C0C0", // Example for silver
+  Red: "#FF0000", // Example for red
+  // Add more colors as needed
+};
+
 interface Props {
   product: Product;
 }
 
 export default function ProductClient({ product }: Props) {
+  const displayColor = colorMap[product.color] || product.color.toLowerCase();
+
   return (
     <div className="container mx-auto px-4 ">
       {/* Back Button */}
@@ -53,26 +63,19 @@ export default function ProductClient({ product }: Props) {
         <div className="grid gap-6">
           <div className="flex flex-col">
             {/* Product Name */}
-            <h1 className="font-bold text-3xl sm:text-4xl text-gray-800">{product.name}</h1>
+            <h1 className="font-bold text-3xl sm:text-4xl text-gray-800">
+              {product.name}
+            </h1>
 
             {/* Product Description */}
-            <p className="text-gray-600 text-md sm:text-lg">{product.description}</p>
+            <p className="text-gray-600 text-md sm:text-lg">
+              {product.description}
+            </p>
 
-            {/* Color Picker */}
-            <div className="flex flex-wrap items-center mt-4">
-              <Label className="text-lg font-semibold mr-4">Colors:</Label>
-              <button
-                aria-label="Color Option 1"
-                className="border-2 border-gray-300 rounded-full w-6 h-6 focus:outline-none hover:shadow-md transition"
-              ></button>
-              <button
-                aria-label="Color Option 2"
-                className="border-2 border-gray-300 ml-2 bg-gray-700 rounded-full w-6 h-6 focus:outline-none hover:shadow-md transition"
-              ></button>
-              <button
-                aria-label="Color Option 3"
-                className="border-2 border-gray-300 ml-2 bg-red-500 rounded-full w-6 h-6 focus:outline-none hover:shadow-md transition"
-              ></button>
+            {/*  Color Display */}
+            <div className="flex items-center mt-4">
+              <span className="text-sm font-medium mr-2">Color:</span>
+              <Badge>{product.color}</Badge>
             </div>
 
             {/* Product Status */}

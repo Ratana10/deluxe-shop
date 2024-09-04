@@ -1,10 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { Label } from "@/components/ui/label";
 import { Product } from "@/types";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 interface Props {
   product: Product;
@@ -15,7 +11,7 @@ export function ProductCard({ product }: Props) {
     <div className=" p-4 max-w-sm  transition-shadow">
       {/* Product Image */}
       <Link href={`/products/${product.id}`}>
-        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden rounded-lg shadow-sm">
+        <div className="relative w-full h-[400px] md:h-[300px]  overflow-hidden rounded-lg shadow-sm">
           <Image
             src={product.images[0]}
             alt={product.name}
