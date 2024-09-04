@@ -44,13 +44,7 @@ export default function Header() {
         {/* Logo */}
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
-            <Image
-              alt="logo"
-              src="/img/logo.png"
-              width={150}
-              height={80}
-              className="w-36 h-auto"
-            />
+               <span className="text-4xl font-bold text-[#660404]">Deluxe</span>
           </Link>
         </div>
 
@@ -73,12 +67,7 @@ export default function Header() {
               <SheetHeader>
                 <div className="flex items-center justify-between">
                   <Link href="/" className="-m-1.5 p-1.5">
-                    <Image
-                      alt="logo"
-                      src="/img/logo.png"
-                      width={150}
-                      height={80}
-                    />
+                  <span className="text-2xl font-bold text-[#660404]">Deluxe</span>
                   </Link>
                 </div>
               </SheetHeader>

@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   product: Product;
@@ -11,32 +12,43 @@ interface Props {
 
 export function ProductCard({ product }: Props) {
   return (
-    <Card className="w-full overflow-hidden rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
-      <div className="relative w-full h-[300px]">
-        <Link href={`/products/${product.id}`}>
+    <div className=" p-4 max-w-sm  transition-shadow">
+      {/* Product Image */}
+      <Link href={`/products/${product.id}`}>
+        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden rounded-lg shadow-sm">
           <Image
             src={product.images[0]}
-            alt={product.images[0]}
+            alt={product.name}
             fill
-            className="rounded-t-lg object-cover"
+            className="rounded-lg object-cover border"
           />
-        </Link>
-      </div>
-      <CardContent className="p-3">
-        <Label className="text-xl font-semibold">{product.name}</Label>
-        <div className="flex items-center justify-between">
-          <Label className="leading-loose text-sm">
-            Price: <span>$ {product.price}</span>
-          </Label>
-          <Badge
-            className={`${
-              product.status === "Available" ? "bg-green-800" : "bg-red-500"
-            }`}
-          >
-            {product.status}
-          </Badge>
         </div>
-      </CardContent>
-    </Card>
+      </Link>
+
+      {/* Product Info */}
+      <div className="mt-4">
+        {/* Product Name */}
+        <Link href={`/products/${product.id}`}>
+          <h2 className="text-lg font-semibold text-gray-800">
+            {product.name}
+          </h2>
+        </Link>
+
+        {/* Price and View Detail Button */}
+        <div className="flex justify-between items-center mt-2">
+          {/* Product Price */}
+          <span className="text-lg font-bold text-gray-900">
+            ${product.price.toFixed(2)}
+          </span>
+
+          {/* View Detail Button */}
+          <Link href={`/products/${product.id}`}>
+            <button className="bg-[#AB8529] text-white px-3 py-1 rounded-md text-sm hover:bg-[#AB8529] transition-all">
+              View Detail
+            </button>
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

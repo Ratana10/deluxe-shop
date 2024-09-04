@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+import { Jost, Lora } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 const jost = Jost({ subsets: ["latin"] });
+const display = Lora({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Deluxe",
@@ -18,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jost.className} flex flex-col min-h-screen`}>
+      <body className={`${display.className} flex flex-col min-h-screen`}>
         <Header />
         <div className="mt-24 flex-grow">{children}</div>
         <div className="mt-3">
