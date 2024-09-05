@@ -57,19 +57,22 @@ const ContactUsClient = () => {
       {/* Social Media Links */}
       <div className="flex flex-wrap justify-center gap-8 text-[#AB8529] cursor-pointer mt-4 md:mt-10">
         {contactUs.map((item: ContactUs, index: number) => (
-          <div
+          <a
             key={index}
-            className="flex flex-col items-center transform transition duration-200 hover:scale-110"
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center transform transition duration-200 hover:scale-110 cursor-pointer"
           >
-            {item.icon}
-            <a
-              href={item.href}
-              target="_blank"
-              className="text-lg font-medium mt-4"
-            >
-              {item.label}
-            </a>
-          </div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="flex justify-center items-center">
+                {item.icon}
+              </div>
+              <p className="text-lg font-medium mt-4 text-center">
+                {item.label}
+              </p>
+            </div>
+          </a>
         ))}
       </div>
 
@@ -85,20 +88,15 @@ const ContactUsClient = () => {
           personal
         </p>
 
-        <Button
-          asChild
-          className="bg-[#AB8529] text-white px-3 py-2 rounded-md text-sm hover:bg-opacity-90 transition-all mt-4 lg:mt-6"
+        <a
+          href="https://maps.app.goo.gl/f6P5jgj2Fokr9dFs9"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-[#AB8529] text-white px-3 py-2 rounded-md text-sm hover:bg-opacity-90 transition-all mt-4 lg:mt-6 inline-flex items-center  transform  duration-200 hover:scale-110"
         >
-          <Link
-            href="https://maps.app.goo.gl/f6P5jgj2Fokr9dFs9"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center"
-          >
-            <Map className="mr-2 h-4 w-4" />
-            View on Google Maps
-          </Link>
-        </Button>
+          <Map className="mr-2 h-4 w-4" />
+          View on Google Maps
+        </a>
       </div>
 
       {/* Button Section */}

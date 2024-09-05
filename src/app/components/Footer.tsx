@@ -49,18 +49,14 @@ export default function Footer() {
 
         <div className="flex space-x-4 sm:w-1/3 justify-center sm:justify-end">
           {contactUs.map((item: ContactUs, index: number) => (
-            <div
+            <a
               key={index}
-              className="flex flex-col items-center transform transition duration-200 hover:scale-110"
+              href={item.href}
+              target="_blank"
+              className="text-lg font-medium  flex flex-col items-center transform transition duration-200 hover:scale-125"
             >
               {item.icon}
-              <a
-                href={item.href}
-                target="_blank"
-                className="text-lg font-medium mt-4"
-              >
-              </a>
-            </div>
+            </a>
           ))}
         </div>
       </div>
