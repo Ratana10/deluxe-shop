@@ -1,17 +1,7 @@
 import { Product } from "@/types";
 import Papa from "papaparse";
 
-// Cache and expiration timestamp
-let productCache: Product[] | null = null;
-let cacheExpiry: number | null = null;
-const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
-
 export const getProducts = async (): Promise<Product[]> => {
-  // Check if cache exists and is still valid
-  if (productCache && cacheExpiry && Date.now() < cacheExpiry) {
-    return productCache;
-  }
-
   try {
     const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`);
 
@@ -23,10 +13,6 @@ export const getProducts = async (): Promise<Product[]> => {
 
     const products = await parseCSVToProducts(csvData);
 
-    // Cache the parsed products and set an expiry time
-    productCache = products;
-    cacheExpiry = Date.now() + CACHE_DURATION_MS;
-
     return products;
   } catch (error: any) {
     throw new Error(`Error fetching or parsing products: ${error.message}`);
@@ -36,16 +22,9 @@ export const getProducts = async (): Promise<Product[]> => {
 export const getProductById = async (
   id: string
 ): Promise<Product | undefined> => {
-  if (!productCache) {
-    await getProducts(); // Fetch products if cache is empty
-  }
+  const products = await getProducts();
 
-  return productCache?.find((pro) => pro.id === id);
-};
-
-export const clearProductCache = () => {
-  productCache = null;
-  cacheExpiry = null;
+  return products.find((pro) => pro.id === id);
 };
 
 // Utility function to parse CSV into Product[]
