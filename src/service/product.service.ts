@@ -1,6 +1,7 @@
 "use server";
 
 import { Product } from "@/types";
+import { notFound } from "next/navigation";
 import Papa from "papaparse";
 
 export const getProducts = async (): Promise<Product[]> => {
@@ -26,7 +27,10 @@ export const getProductById = async (
 ): Promise<Product | undefined> => {
   const products = await getProducts();
 
-  return products.find((pro) => pro.id === id);
+  const product = products.find((pro) => pro.id === id);
+  
+
+  return product;
 };
 
 // Utility function to parse CSV into Product[]
