@@ -5,12 +5,9 @@ import {
   Instagram,
   Mail,
   Map,
-  MapPin,
-  MapPinned,
   Phone,
   Send,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const contactUs: ContactUs[] = [
@@ -89,7 +86,7 @@ const ContactUsClient = () => {
 
         <p className=" sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center">
           Visit our physical store in Phnom Penh for exclusive jewelry
-          collections and personalized service. We'd love to meet you in
+          collections and personalized service. We&apos; love to meet you in
           personal
         </p>
 
