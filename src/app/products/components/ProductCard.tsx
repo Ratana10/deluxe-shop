@@ -8,7 +8,7 @@ interface Props {
 
 export function ProductCard({ product }: Props) {
   return (
-    <div className=" p-4 max-w-sm  transition-shadow">
+    <div className="px-1 max-w-sm  transition-shadow">
       {/* Product Image */}
       <Link href={`/products/${product.id}`}>
         <div className="relative w-full h-[400px] md:h-[300px]  overflow-hidden rounded-lg shadow-sm">
@@ -25,7 +25,7 @@ export function ProductCard({ product }: Props) {
       <div className="mt-4">
         {/* Product Name */}
         <Link href={`/products/${product.id}`}>
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-[#660404]">
             {product.name}
           </h2>
         </Link>
@@ -39,7 +39,7 @@ export function ProductCard({ product }: Props) {
 
           {/* View Detail Button */}
           <Link href={`/products/${product.id}`}>
-            <button className="bg-[#AB8529] text-white px-3 py-1 rounded-md text-sm hover:bg-[#AB8529] transition-all">
+            <button className="bg-[#AB8529] text-white px-3 py-2 rounded-md text-sm hover:bg-[#AB8529] transition-all">
               View Detail
             </button>
           </Link>

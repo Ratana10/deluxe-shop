@@ -67,12 +67,12 @@ const ProductDetail = ({ product }: Props) => {
         <div className="grid gap-6">
           <div className="flex flex-col">
             {/* Product Name */}
-            <h1 className="font-bold text-3xl sm:text-4xl text-gray-800">
+            <h1 className="font-bold text-3xl sm:text-4xl text-[#660404]">
               {product.name}
             </h1>
 
             {/* Product Description */}
-            <p className="text-gray-600 text-md sm:text-lg">
+            <p className="text-gray-600 text-md sm:text-lg my-6">
               {product.description}
             </p>
 
