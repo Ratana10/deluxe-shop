@@ -21,7 +21,7 @@ export default function Footer() {
             <Facebook className="w-6 h-6 hover:text-gray-400" />
           </a>
           <a
-            href="https://www.instagram.com/de.luxeglam0ur/"
+            href="https://www.instagram.com/de.luxeglam0ur?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
             target="_blank"
           >
             <Instagram className="w-6 h-6 hover:text-gray-400" />
