@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React from 'react'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
 
 export interface Navbar {
   id: number;
@@ -27,25 +27,34 @@ export const navbars: Navbar[] = [
   },
 ];
 
-
 const Navbar = () => {
   const pathname = usePathname();
 
   return (
     <div className="hidden lg:flex lg:gap-x-12">
-      {navbars.map((nav: Navbar) => (
-        <Link
-          href={nav.href}
-          key={nav.id}
-          className={`text-lg font-medium leading-6 text-gray-900 ${
-            pathname === nav.href ? "border-b-2 border-[#AB8529]" : ""
-          }`}
-        >
-          {nav.title}
-        </Link>
-      ))}
+      {navbars.map((nav: Navbar) => {
+        let isActive = false;
+        if (nav.href === "/") {
+          // Only match exactly for the Home route
+          isActive = pathname === "/";
+        } else {
+          // For other routes, use startsWith to match sub-routes
+          isActive = pathname.startsWith(nav.href);
+        }
+        return (
+          <Link
+            href={nav.href}
+            key={nav.id}
+            className={`text-lg font-medium leading-6 text-gray-900 ${
+              isActive ? "border-b-2 border-[#AB8529]" : ""
+            }`}
+          >
+            {nav.title}
+          </Link>
+        );
+      })}
     </div>
   );
-}
+};
 
-export default Navbar
+export default Navbar;
