@@ -29,7 +29,7 @@ export default function RootLayout({
         <Header />
 
         {/* Main content area grows to fill available space, ensuring the footer stays at the bottom */}
-        <main className="flex-grow mt-24">{children}</main>
+        <main className="flex-grow mt-14">{children}</main>
 
         {/* Footer with proper spacing */}
         <footer className="mt-3">

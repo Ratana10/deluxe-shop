@@ -8,11 +8,7 @@ const ProductIdPage = async ({ params }: { params: { id: string } }) => {
   if (!product) {
     return notFound();
   }
-  return (
-    <>
-      <ProductClient product={product} />
-    </>
-  );
+  return <ProductClient product={product} />;
 };
 
 export default ProductIdPage;
