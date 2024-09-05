@@ -33,7 +33,7 @@ export const getProductById = async (
 
 // Utility function to parse CSV into Product[]
 const parseCSVToProducts = (csvData: string): Promise<Product[]> => {
-  const googleDriveBastUrl = process.env.PUBLIC_DRIVE_URL;
+  const googleDriveBastUrl = process.env.DRIVE_URL;
 
   return new Promise((resolve, reject) => {
     Papa.parse<Product>(csvData, {
