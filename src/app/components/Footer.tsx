@@ -14,18 +14,18 @@ export default function Footer() {
         </div>
 
         <div className="flex space-x-4 sm:w-1/3 justify-center sm:justify-end">
-          <Link
+          <a
             href="https://www.facebook.com/profile.php?id=61561814585184"
-            aria-label="Facebook"
+            target="_blank"
           >
             <Facebook className="w-6 h-6 hover:text-gray-400" />
-          </Link>
-          <Link
+          </a>
+          <a
             href="https://www.instagram.com/de.luxeglam0ur/"
-            aria-label="Instagram"
+            target="_blank"
           >
             <Instagram className="w-6 h-6 hover:text-gray-400" />
-          </Link>
+          </a>
         </div>
       </div>
     </footer>
