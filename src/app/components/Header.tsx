@@ -1,41 +1,16 @@
 "use client";
+
 import { useState } from "react";
-import { Dialog, DialogPanel, PopoverGroup } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-
-interface Navbar {
-  id: number;
-  title: string;
-  href: string;
-}
-const navbars: Navbar[] = [
-  {
-    id: 1,
-    title: "Home",
-    href: "/",
-  },
-  {
-    id: 2,
-    title: "Products",
-    href: "/products",
-  },
-  {
-    id: 3,
-    title: "Contact Us",
-    href: "/",
-  },
-];
+import { usePathname, useRouter } from "next/navigation";
+import Navbar, { navbars } from "./Navbar";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -49,11 +24,11 @@ export default function Header() {
         {/* Logo */}
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
-               <span className="text-4xl font-bold text-[#660404]">Deluxe</span>
+            <span className="text-4xl font-bold text-[#660404]">Deluxe</span>
           </Link>
         </div>
 
-        {/* Hamburger */}
+        {/* Hamburger for mobile */}
         <div className="flex lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
@@ -72,14 +47,16 @@ export default function Header() {
               <SheetHeader>
                 <div className="flex items-center justify-between">
                   <Link href="/" className="-m-1.5 p-1.5">
-                  <span className="text-2xl font-bold text-[#660404]">Deluxe</span>
+                    <span className="text-2xl font-bold text-[#660404]">
+                      Deluxe
+                    </span>
                   </Link>
                 </div>
               </SheetHeader>
               <div className="mt-6 flow-root">
                 <div className="-my-6 divide-y divide-gray-500/10">
                   <div className="space-y-2 py-6">
-                    {navbars.map((nav: Navbar) => (
+                    {navbars.map((nav) => (
                       <Link
                         href={nav.href}
                         key={nav.id}
@@ -96,18 +73,8 @@ export default function Header() {
           </Sheet>
         </div>
 
-        {/* Navbar */}
-        <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-          {navbars.map((nav: Navbar) => (
-            <Link
-              href={nav.href}
-              key={nav.id}
-              className="text-lg font-medium leading-6 text-gray-900"
-            >
-              {nav.title}
-            </Link>
-          ))}
-        </PopoverGroup>
+        {/* Desktop Navbar */}
+        <Navbar />
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-3"></div>
       </nav>

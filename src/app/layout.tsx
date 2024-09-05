@@ -25,11 +25,16 @@ export default function RootLayout({
         <meta name="theme-color" content="#360505" />
       </head>
       <body className={`${lora.className} flex flex-col min-h-screen`}>
+        {/* Header should stay at the top */}
         <Header />
-        <div className="mt-24 flex-grow">{children}</div>
-        <div className="mt-3">
+
+        {/* Main content area grows to fill available space, ensuring the footer stays at the bottom */}
+        <main className="flex-grow mt-24">{children}</main>
+
+        {/* Footer with proper spacing */}
+        <footer className="mt-3">
           <Footer />
-        </div>
+        </footer>
       </body>
     </html>
   );

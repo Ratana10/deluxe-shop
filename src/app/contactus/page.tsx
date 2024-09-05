@@ -1,12 +1,7 @@
-import React from 'react'
+import ContactUsClient from "./components/ContactUsClient";
 
 const ContactUsPage = () => {
-  return (
-    <div>
-      {/* Social Media Link */}
-      
-    </div>
-  )
-}
+  return <ContactUsClient />
+};
 
-export default ContactUsPage
+export default ContactUsPage;

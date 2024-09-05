@@ -1,5 +1,39 @@
 import Link from "next/link";
-import { Facebook, Twitter, Instagram } from "lucide-react";
+import { Facebook, Twitter, Instagram, Phone, Send, Mail } from "lucide-react";
+import { ContactUs } from "@/types";
+
+const contactUs: ContactUs[] = [
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/ratana.san.79/",
+    icon: <Facebook size={25} />,
+    src: "/img/facebook.png",
+  },
+  {
+    label: "Instagram",
+    href: "https://www.facebook.com/ratana.san.79/",
+    icon: <Instagram size={25} />,
+    src: "/img/instagram.png",
+  },
+  {
+    label: "Phone",
+    href: "https://www.facebook.com/ratana.san.79/",
+    icon: <Phone size={25} />,
+    src: "/img/phone.png",
+  },
+  {
+    label: "Telegram",
+    href: "https://www.facebook.com/ratana.san.79/",
+    icon: <Send size={25} />,
+    src: "/img/telegram.png",
+  },
+  {
+    label: "Mail",
+    href: "https://www.facebook.com/ratana.san.79/",
+    icon: <Mail size={25} />,
+    src: "/img/mail.png",
+  },
+];
 
 export default function Footer() {
   return (
@@ -10,22 +44,24 @@ export default function Footer() {
         </div>
 
         <div className="mb-4 sm:mb-0 sm:w-1/3 text-center">
-          <p className="text-sm">© Copyright 2024. All Rights Reserved.</p>
+          <p className="text-sm">© Copyright Deluxe. All Rights Reserved.</p>
         </div>
 
         <div className="flex space-x-4 sm:w-1/3 justify-center sm:justify-end">
-          <a
-            href="https://www.facebook.com/profile.php?id=61561814585184"
-            target="_blank"
-          >
-            <Facebook className="w-6 h-6 hover:text-gray-400" />
-          </a>
-          <a
-            href="https://www.instagram.com/de.luxeglam0ur?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-            target="_blank"
-          >
-            <Instagram className="w-6 h-6 hover:text-gray-400" />
-          </a>
+          {contactUs.map((item: ContactUs, index: number) => (
+            <div
+              key={index}
+              className="flex flex-col items-center transform transition duration-200 hover:scale-110"
+            >
+              {item.icon}
+              <a
+                href={item.href}
+                target="_blank"
+                className="text-lg font-medium mt-4"
+              >
+              </a>
+            </div>
+          ))}
         </div>
       </div>
     </footer>

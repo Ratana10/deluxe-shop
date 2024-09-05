@@ -10,3 +10,10 @@ export interface Product {
   createdAt: string;
   updatedAt: string; 
 }
+
+export interface ContactUs{
+  label: string;
+  href: string;
+  icon: any;
+  src: string;
+}
