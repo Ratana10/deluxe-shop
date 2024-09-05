@@ -1,13 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
-
 const Hero = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 h-[calc(100vh-119px)]">
-      <img src="/img/hero1.jpg" alt="" className="w-full h-full object-cover" />
+      <img src="/img/hero1.jpg" alt="product" className="w-full h-full object-cover" />
       <div className="flex flex-col justify-center items-start p-8">
         <h1 className="text-5xl font-bold text-[#660404] mb-4">
           Timeless Elegance

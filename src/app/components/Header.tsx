@@ -9,7 +9,6 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { usePathname, useRouter } from "next/navigation";
 import Navbar, { navbars } from "./Navbar";
 
 export default function Header() {
@@ -30,7 +29,7 @@ export default function Header() {
 
         {/* Hamburger for mobile */}
         <div className="flex lg:hidden">
-          <Sheet>
+          <Sheet open={open}>
             <SheetTrigger asChild>
               <button
                 type="button"
