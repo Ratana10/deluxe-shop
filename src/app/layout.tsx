@@ -32,9 +32,7 @@ export default function RootLayout({
         <main className="flex-grow mt-14">{children}</main>
 
         {/* Footer with proper spacing */}
-        <footer className="mt-3">
-          <Footer />
-        </footer>
+        <Footer />
       </body>
     </html>
   );

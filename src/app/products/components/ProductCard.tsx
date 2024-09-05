@@ -39,7 +39,7 @@ export function ProductCard({ product }: Props) {
 
           {/* View Detail Button */}
           <Link href={`/products/${product.id}`} className="ml-auto">
-            <button className="bg-[#AB8529] text-white px-3 py-2 rounded-md text-sm hover:bg-[#AB8529] transition-all">
+            <button className="btn-primary">
               View Detail
             </button>
           </Link>
