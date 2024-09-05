@@ -31,14 +31,14 @@ export function ProductCard({ product }: Props) {
         </Link>
 
         {/* Price and View Detail Button */}
-        <div className="flex justify-between items-center mt-2">
+        <div className="flex justify-between items-end mt-2">
           {/* Product Price */}
           <span className="text-lg font-bold text-gray-900">
             ${product.price.toFixed(2)}
           </span>
 
           {/* View Detail Button */}
-          <Link href={`/products/${product.id}`}>
+          <Link href={`/products/${product.id}`} className="ml-auto">
             <button className="bg-[#AB8529] text-white px-3 py-2 rounded-md text-sm hover:bg-[#AB8529] transition-all">
               View Detail
             </button>
