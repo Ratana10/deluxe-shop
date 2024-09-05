@@ -5,7 +5,9 @@ import Papa from "papaparse";
 
 export const getProducts = async (): Promise<Product[]> => {
   try {
-    const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`);
+    const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`, {
+      cache: "no-store"
+    });
 
     if (!res.ok) {
       throw new Error(`Failed to fetch data. Status: ${res.statusText}`);
