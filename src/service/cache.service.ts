@@ -1,10 +1,17 @@
 import { Product } from "@/types";
 import Papa from "papaparse";
 
+
+const CACHE_REVALIDATE_TIME = 3600;
+
+
 export const getProducts = async (): Promise<Product[]> => {
   try {
     const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`, {
-      cache: "no-cache",
+      cache: "force-cache",
+      next: {
+        revalidate: CACHE_REVALIDATE_TIME
+      }
     });
 
     if (!res.ok) {
