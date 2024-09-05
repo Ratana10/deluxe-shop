@@ -1,5 +1,3 @@
-"use server";
-
 import { Product } from "@/types";
 import Papa from "papaparse";
 
