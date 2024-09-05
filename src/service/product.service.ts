@@ -6,7 +6,7 @@ import Papa from "papaparse";
 export const getProducts = async (): Promise<Product[]> => {
   try {
     const res = await fetch(`${process.env.SPREADSHEET_DATA_URL}`, {
-      cache: "no-store"
+      cache: "no-cache",
     });
 
     if (!res.ok) {
@@ -29,7 +29,7 @@ export const getProductById = async (
   const products = await getProducts();
 
   const product = products.find((pro) => pro.id === id);
-  
+
   return product;
 };
 
