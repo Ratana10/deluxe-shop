@@ -72,9 +72,10 @@ const ProductDetail = ({ product }: Props) => {
             </h1>
 
             {/* Product Description */}
-            <p className="text-gray-600 text-md sm:text-lg my-6">
-              {product.description}
-            </p>
+            <div className="my-6">
+              <h3 className="text-lg font-semibold mb-2">Description:</h3>
+              <p className="text-gray-600 text-md sm:text-lg">{product.description}</p>
+            </div>
 
             {/*  Color Display */}
             <div className="flex items-center mt-4">
@@ -83,7 +84,7 @@ const ProductDetail = ({ product }: Props) => {
             </div>
 
             {/* Product Status */}
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <Badge
                 className={`${
                   product.status === "Available" ? "bg-green-600" : "bg-red-500"
@@ -91,7 +92,7 @@ const ProductDetail = ({ product }: Props) => {
               >
                 {product.status}
               </Badge>
-            </div>
+            </div> */}
 
             {/* Separator */}
             <Separator className="my-4" />
