@@ -1,6 +1,6 @@
 import ProductClient from "./components/ProductClient";
 import { getProducts } from "@/service/product.service";
-import { Product } from "@/types";
+import { Suspense } from "react";
 
 const ProductPage = async () => {
   const products = await getProducts();

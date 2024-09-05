@@ -22,11 +22,16 @@ interface Navbar {
 const navbars: Navbar[] = [
   {
     id: 1,
+    title: "Home",
+    href: "/",
+  },
+  {
+    id: 2,
     title: "Products",
     href: "/products",
   },
   {
-    id: 2,
+    id: 3,
     title: "Contact Us",
     href: "/",
   },
