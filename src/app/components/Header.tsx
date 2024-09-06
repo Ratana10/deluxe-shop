@@ -29,7 +29,7 @@ export default function Header() {
 
         {/* Hamburger for mobile */}
         <div className="flex lg:hidden">
-          <Sheet open={open}>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"

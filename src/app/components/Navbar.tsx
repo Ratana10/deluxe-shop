@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { motion } from "framer-motion";
 
 export interface Navbar {
   id: number;
@@ -31,7 +32,12 @@ const Navbar = () => {
   const pathname = usePathname();
 
   return (
-    <div className="hidden lg:flex lg:gap-x-12">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7 }}
+      className="hidden lg:flex lg:gap-x-12"
+    >
       {navbars.map((nav: Navbar) => {
         let isActive = false;
         if (nav.href === "/") {
@@ -42,18 +48,29 @@ const Navbar = () => {
           isActive = pathname.startsWith(nav.href);
         }
         return (
-          <Link
-            href={nav.href}
-            key={nav.id}
-            className={`text-lg font-medium leading-6 text-gray-900 ${
-              isActive ? "border-b-2 border-[#AB8529]" : ""
-            }`}
-          >
-            {nav.title}
-          </Link>
+          <motion.div  key={nav.id} className="relative group">
+            <Link
+              href={nav.href}
+              className={`text-lg font-medium leading-6 ${
+                isActive ? "text-[#AB8529]" : "text-gray-900"
+              } hover:text-[#AB8529] transition-colors duration-200`}
+            >
+              {nav.title}
+            </Link>
+
+            {/* Animated underline */}
+            {isActive && (
+              <motion.div
+                className="absolute left-0 bottom-0 h-[2px] bg-[#AB8529]"
+                layoutId="underline"
+                style={{ width: "100%" }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              />
+            )}
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
 

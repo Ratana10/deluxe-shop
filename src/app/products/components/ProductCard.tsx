@@ -31,6 +31,7 @@ export function ProductCard({ product }: Props) {
             alt={product.name}
             fill
             className="rounded-lg object-cover border"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
       </Link>
