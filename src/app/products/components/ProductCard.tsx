@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { Product } from "@/types";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 interface Props {
   product: Product;
@@ -38,10 +41,12 @@ export function ProductCard({ product }: Props) {
           </span>
 
           {/* View Detail Button */}
-          <Link href={`/products/${product.id}`} className="ml-auto">
-            <button className="btn-primary">
-              View Detail
-            </button>
+          <Link
+            href={`/products/${product.id}`}
+            className="ml-auto"
+            scroll={false}
+          >
+            <button className="btn-primary">View Detail</button>
           </Link>
         </div>
       </div>

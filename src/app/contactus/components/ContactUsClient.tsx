@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
+"use client"
+
 import { ContactUs } from "@/types";
 import { Facebook, Instagram, Mail, Map, Phone, Send } from "lucide-react";
-import Link from "next/link";
+import { motion } from "framer-motion";
 
 const contactUs: ContactUs[] = [
   {
@@ -41,17 +42,24 @@ const ContactUsClient = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="text-center space-y-4 mt-6 md:mt-8 px-4 lg:px-8">
         {/* Header */}
-        <h2 className="text-3xl md:text-4xl font-bold mb-2 lg:mb-4 text-[#660404]">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="text-3xl md:text-4xl font-bold mb-2 lg:mb-4 text-[#660404]"
+        >
           Connect With Us
-        </h2>
+        </motion.h2>
 
         {/* Description */}
-        <p className="sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center">
+        <motion.p
+         initial={{ x: -100 }} animate={{ x: 0 }} transition={{ duration: 1 }}
+        className="sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center">
           At our jewelry store, we value building a connection with you. Whether
           you have a question about our products, need assistance, or just want
           to say hello, feel free to contact us through any of the following
           platforms. Our team is always here to assist you.
-        </p>
+        </motion.p>
       </div>
 
       {/* Social Media Links */}

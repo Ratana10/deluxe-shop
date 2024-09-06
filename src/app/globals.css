@@ -71,3 +71,6 @@
   }
 }
 
+.smooth-transition {
+  will-change: transform, opacity;
+}

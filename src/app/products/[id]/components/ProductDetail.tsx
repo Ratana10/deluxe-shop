@@ -14,6 +14,7 @@ import {
 import { Product } from "@/types";
 import BackButton from "@/components/BackButton";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 interface Props {
   product: Product;
@@ -37,7 +38,13 @@ const ProductDetail = ({ product }: Props) => {
       {/* Back Button */}
       <BackButton text="Back" />
 
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mt-2">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ ease: "easeIn", duration: 0.3 }}
+        className="grid md:grid-cols-2 gap-8 lg:gap-12 mt-2"
+      >
         {/* Carousel Section */}
         <div className="relative overflow-hidden rounded-lg border shadow-sm">
           <Carousel className="w-full">
@@ -74,7 +81,9 @@ const ProductDetail = ({ product }: Props) => {
             {/* Product Description */}
             <div className="my-6">
               <h3 className="text-lg font-semibold mb-2">Description:</h3>
-              <p className="text-gray-600 text-md sm:text-lg">{product.description}</p>
+              <p className="text-gray-600 text-md sm:text-lg">
+                {product.description}
+              </p>
             </div>
 
             {/*  Color Display */}
@@ -107,7 +116,11 @@ const ProductDetail = ({ product }: Props) => {
 
             {/* Modal for Full-size Image */}
             {isModalOpen && (
-              <div
+              <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4"
                 onClick={closeModal} // Close modal when clicking outside the image
               >
@@ -148,11 +161,11 @@ const ProductDetail = ({ product }: Props) => {
                     &times;
                   </button>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

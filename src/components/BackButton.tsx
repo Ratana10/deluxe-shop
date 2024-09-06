@@ -10,7 +10,7 @@ export default function BackButton({ text }: Props) {
   return (
     <button 
       onClick={() => router.back()}
-      className="flex items-center mb-2">
+      className="flex items-center my-2">
       <CircleArrowLeft className="w-4 h-4 mr-2" /> {text}
     </button>
   );
