@@ -3,15 +3,26 @@
 import Image from "next/image";
 import { Product } from "@/types";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 interface Props {
   product: Product;
 }
 
 export function ProductCard({ product }: Props) {
+  const ref = useRef(null);
+  const inView = useInView(ref);
+
   return (
-    <div className="px-1 max-w-sm  transition-shadow">
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 50, scale: 0.9, rotate: 2 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1, rotate: 0 } : {}} // Animate when the card comes into view
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      whileHover={{ scale: 1.05 }}
+      className="px-1 max-w-sm  transition-shadow transform-gpu"
+    >
       {/* Product Image */}
       <Link href={`/products/${product.id}`}>
         <div className="relative w-full h-[400px] md:h-[300px]  overflow-hidden rounded-lg shadow-sm">
@@ -28,9 +39,13 @@ export function ProductCard({ product }: Props) {
       <div className="mt-4">
         {/* Product Name */}
         <Link href={`/products/${product.id}`}>
-          <h2 className="text-lg font-semibold text-[#660404]">
+          <motion.h2
+            whileHover={{ color: "#AB8529", scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+            className="text-lg font-semibold text-[#660404]"
+          >
             {product.name}
-          </h2>
+          </motion.h2>
         </Link>
 
         {/* Price and View Detail Button */}
@@ -41,15 +56,11 @@ export function ProductCard({ product }: Props) {
           </span>
 
           {/* View Detail Button */}
-          <Link
-            href={`/products/${product.id}`}
-            className="ml-auto"
-            scroll={false}
-          >
+          <Link href={`/products/${product.id}`} className="ml-auto">
             <button className="btn-primary">View Detail</button>
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

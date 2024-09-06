@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { ContactUs } from "@/types";
 import { Facebook, Instagram, Mail, Map, Phone, Send } from "lucide-react";
@@ -53,8 +53,11 @@ const ContactUsClient = () => {
 
         {/* Description */}
         <motion.p
-         initial={{ x: -100 }} animate={{ x: 0 }} transition={{ duration: 1 }}
-        className="sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center">
+          initial={{ x: -100 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 1 }}
+          className="sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center"
+        >
           At our jewelry store, we value building a connection with you. Whether
           you have a question about our products, need assistance, or just want
           to say hello, feel free to contact us through any of the following
@@ -86,15 +89,25 @@ const ContactUsClient = () => {
 
       {/* Text */}
       <div className="text-center space-y-4 mt-6 md:mt-10 px-4 lg:px-8">
-        <h3 className="text-3xl  md:text-4xl font-bold mb-2 lg:md4 text-[#660404]">
+        <motion.h3
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="text-3xl  md:text-4xl font-bold mb-2 lg:md4 text-[#660404]"
+        >
           Our Store Location
-        </h3>
+        </motion.h3>
 
-        <p className=" sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center">
+        <motion.p
+          initial={{ x: 100 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 1 }}
+          className=" sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center"
+        >
           Visit our physical store in Phnom Penh for exclusive jewelry
           collections and personalized service. We&apos; love to meet you in
           personal
-        </p>
+        </motion.p>
 
         <a
           href="https://maps.app.goo.gl/f6P5jgj2Fokr9dFs9"

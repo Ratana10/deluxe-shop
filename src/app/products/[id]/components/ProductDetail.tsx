@@ -33,20 +33,50 @@ const ProductDetail = ({ product }: Props) => {
     setIsModalOpen(false);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeInOut",
+        when: "beforeChildren", // Ensures children animations start after container
+        staggerChildren: 0.2, // Stagger each child by 0.2s
+      },
+    },
+    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.3 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Back Button */}
       <BackButton text="Back" />
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ ease: "easeIn", duration: 0.3 }}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={containerVariants}
         className="grid md:grid-cols-2 gap-8 lg:gap-12 mt-2"
       >
         {/* Carousel Section */}
-        <div className="relative overflow-hidden rounded-lg border shadow-sm">
+        <motion.div
+          variants={itemVariants}
+          className="relative overflow-hidden rounded-lg border shadow-sm"
+        >
           <Carousel className="w-full">
             <CarouselContent>
               {product.images.map((image: string, index: number) => (
@@ -68,10 +98,10 @@ const ProductDetail = ({ product }: Props) => {
             <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition" />
             <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition" />
           </Carousel>
-        </div>
+        </motion.div>
 
         {/* Product Details Section */}
-        <div className="grid gap-6">
+        <motion.div variants={itemVariants} className="grid gap-6">
           <div className="flex flex-col">
             {/* Product Name */}
             <h1 className="font-bold text-3xl sm:text-4xl text-[#660404]">
@@ -117,10 +147,10 @@ const ProductDetail = ({ product }: Props) => {
             {/* Modal for Full-size Image */}
             {isModalOpen && (
               <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4"
                 onClick={closeModal} // Close modal when clicking outside the image
               >
@@ -164,7 +194,7 @@ const ProductDetail = ({ product }: Props) => {
               </motion.div>
             )}
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );

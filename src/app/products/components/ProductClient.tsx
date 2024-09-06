@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import { Product } from "@/types";
 import { ProductCard } from "./ProductCard";
+import { motion } from "framer-motion";
 
 interface Props {
   products: Product[] | null;
@@ -19,11 +22,26 @@ const ProductClient = ({ products }: Props) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+              staggerChildren: 0.1, // Stagger animation for each product
+              delayChildren: 0.2, // Start animation after delay
+            },
+          },
+        }}
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      >
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };
