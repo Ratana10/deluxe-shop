@@ -9,24 +9,19 @@ if (!BOT_TOKEN) {
     throw new Error("TELEGRAM_BOT_TOKEN is required");
 }
 var bot = new telegraf_1.Telegraf(BOT_TOKEN);
-// Define bot commands
-// bot.start((ctx) => ctx.reply("Welcome to the Deluxe Store Bot!"));
-bot.help(function (ctx) {
-    return ctx.reply("Welcome", {
-        reply_markup: {
-            keyboard: [[{ text: "web app", web_app: { url: WEB_LINK } }]],
-        },
-    });
+bot.telegram.setChatMenuButton({
+    menuButton: {
+        type: "web_app",
+        text: "Order",
+        web_app: {
+            url: WEB_LINK
+        }
+    }
 });
 // bot.on("message", (ctx) => {
 //   console.log(`Chat ID: ${ctx.chat.id}`);
 //   ctx.reply("Got your message!");
 // });
-bot.start(function (ctx) {
-    return ctx.reply("Welcome! Click the button below to place an order.", telegraf_1.Markup.inlineKeyboard([
-        telegraf_1.Markup.button.callback("Order Coffee", "order_coffee"),
-    ]));
-});
 bot.action("order_coffee", function (ctx) {
     var userId = ctx.from.id;
     var orderDetails = "1 x Coffee";

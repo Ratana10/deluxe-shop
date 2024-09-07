@@ -12,30 +12,20 @@ if (!BOT_TOKEN) {
 
 const bot = new Telegraf(BOT_TOKEN);
 
-// Define bot commands
-
-// bot.start((ctx) => ctx.reply("Welcome to the Deluxe Store Bot!"));
-bot.help((ctx) =>
-  ctx.reply("Welcome", {
-    reply_markup: {
-      keyboard: [[{ text: "web app", web_app: { url: WEB_LINK } }]],
-    },
-  })
-);
+bot.telegram.setChatMenuButton({
+  menuButton: {
+    type: "web_app",
+    text: "Order",
+    web_app: {
+      url: WEB_LINK
+    }
+  }
+})
 
 // bot.on("message", (ctx) => {
 //   console.log(`Chat ID: ${ctx.chat.id}`);
 //   ctx.reply("Got your message!");
 // });
-
-bot.start((ctx) =>
-  ctx.reply(
-    "Welcome! Click the button below to place an order.",
-    Markup.inlineKeyboard([
-      Markup.button.callback("Order Coffee", "order_coffee"),
-    ])
-  )
-);
 
 bot.action("order_coffee", (ctx) => {
   const userId = ctx.from.id;
