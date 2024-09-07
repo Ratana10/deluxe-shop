@@ -25,7 +25,7 @@ export function ProductCard({ product }: Props) {
     >
       {/* Product Image */}
       <Link href={`/products/${product.id}`}>
-        <div className="relative w-full h-[400px] md:h-[300px]  overflow-hidden rounded-lg shadow-sm">
+        <div className="relative w-full h-[300px] sm:h-[250px] md:h-[400px] lg:h-[300px] overflow-hidden rounded-lg shadow-sm">
           <Image
             src={product.images[0]}
             alt={product.name}
