@@ -17,3 +17,11 @@ export interface ContactUs{
   icon: any;
   src: string;
 }
+
+export interface CartItem{
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
