@@ -1,9 +1,6 @@
 import bot from "@/app/bot/bot";
 import { Markup } from "telegraf";
 import dedent from "dedent";
-import { CartItem } from "@/types";
-import { connectMongoDB } from "@/lib/mongodb";
-import Order from "@/models/Order";
 import { createOrder, updateCustomerMessageId } from "@/service/order.service";
 import { format } from "date-fns";
 
@@ -21,7 +18,7 @@ export async function POST(req: Request, res: Response) {
     }
 
     //Save cart into db
-    const orderId = await createOrder(USER_CHAT_ID);
+    const orderId = await createOrder(USER_CHAT_ID, cart);
 
     const formattedCartItems = cart
       .map(
@@ -40,29 +37,31 @@ export async function POST(req: Request, res: Response) {
       )
       .toFixed(2);
 
-    const currentDate = format(new Date(), "MMMM do, yyyy hh:mm:ss a");
+    const currentDate = format(new Date(), "MM-dd-yyyy hh:mm:ss a");
 
     // Seller message
     const sellerMessage = dedent(
       `
-      ✨You have a new order:
+      ✨ You have a new order:
       ${formattedCartItems}
-      
-      Total: $${totalPrice}
-
+      💵 Total: $${totalPrice}
+      📦 Order ID: ${orderId}
       📅 Date: ${currentDate}
+
+      📞 Contact Seller: 0964347813
       `
     );
 
     // Seller message
     const customerMessage = dedent(
       `
-        ✨You have order:
-        ${formattedCartItems}
-        
-        Total: $${totalPrice}
+      ✨ You have placed an order:
+      ${formattedCartItems}
+      💵 Total: $${totalPrice}
+      📦 Order ID: ${orderId}
+      📅 Date: ${currentDate}
 
-        📅 Date: ${currentDate}
+      📞 Contact Seller: 0964347813
         `
     );
 
@@ -100,7 +99,6 @@ export async function POST(req: Request, res: Response) {
     //update the order with customer msgId
     await updateCustomerMessageId(orderId, cusMsgId);
 
-    console.log("Cart", cart);
     return new Response(
       JSON.stringify({
         message: "Order created and Telegram message sent successfully",

@@ -11,6 +11,18 @@ export interface Product {
   updatedAt: string; 
 }
 
+export interface OrderDetail{
+  productId: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+export interface Order{
+  userId: string;
+  status: string;
+  cusMsgId: number;
+  orderDetails: OrderDetail[]
+}
 export interface ContactUs{
   label: string;
   href: string;
