@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Facebook, Twitter, Instagram, Phone, Send, Mail } from "lucide-react";
 import { ContactUs } from "@/types";
+import { setting } from "@/db/setting";
 
 const contactUs: ContactUs[] = [
   {
@@ -44,7 +45,9 @@ export default function Footer() {
         </div>
 
         <div className="mb-4 sm:mb-0 sm:w-1/3 text-center">
-          <p className="text-sm">© Copyright Deluxe. All Rights Reserved.</p>
+          <p className="text-sm">
+            © Copyright ${setting.logoName}. All Rights Reserved.
+          </p>
         </div>
 
         <div className="flex space-x-4 sm:w-1/3 justify-center sm:justify-end">
