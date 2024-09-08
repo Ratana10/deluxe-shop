@@ -1,8 +1,8 @@
 import { getProducts } from "@/service/product.service";
-import ProductClient from "./products/components/ProductClient";
 import Client from "./(root)/components/Client";
+import { CartProvider } from "./context/CartContext";
 
 export default async function Home() {
   const products = await getProducts();
-  return <Client />
+  return <Client />;
 }

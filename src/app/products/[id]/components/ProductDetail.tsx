@@ -15,6 +15,7 @@ import { Product } from "@/types";
 import BackButton from "@/components/BackButton";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useCart } from "@/app/context/CartContext";
 
 interface Props {
   product: Product;
@@ -23,6 +24,8 @@ interface Props {
 const ProductDetail = ({ product }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+
+  const { addToCart } = useCart();
 
   const openModal = (index: number) => {
     setCurrentIndex(index);
@@ -33,6 +36,18 @@ const ProductDetail = ({ product }: Props) => {
     setIsModalOpen(false);
   };
 
+  const onAddToCart = (product: Product) => {
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image: product.images[0] || "",
+    };
+
+    addToCart(cartItem);
+  };
+  
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: {
@@ -137,11 +152,17 @@ const ProductDetail = ({ product }: Props) => {
             <Separator className="my-4" />
 
             {/* Price Section */}
-            <div className="flex items-center mt-2">
+            <div className="flex items-center justify-between mt-2">
               <Label className="text-2xl font-bold text-gray-800">
                 <span className="">Price:</span>
                 <span className=" ml-2">${product.price}</span>
               </Label>
+              <button
+                className="btn-primary"
+                onClick={() => onAddToCart(product)}
+              >
+                Add To Cart
+              </button>
             </div>
 
             {/* Modal for Full-size Image */}

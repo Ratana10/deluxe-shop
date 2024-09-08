@@ -25,3 +25,13 @@ export interface CartItem{
   quantity: number;
   image: string;
 }
+
+export interface CartContextType {
+  cart: CartItem[];
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (id: string) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
+  clearCart: () => void;
+  totalQuantity: number;
+};

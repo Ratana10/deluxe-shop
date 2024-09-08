@@ -3,6 +3,7 @@ import { Lora } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { CartProvider } from "./context/CartContext";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -26,13 +27,15 @@ export default function RootLayout({
       </head>
       <body className={`${lora.className} flex flex-col min-h-screen`}>
         {/* Header should stay at the top */}
-        <Header />
+        <CartProvider>
+          <Header />
 
-        {/* Main content area grows to fill available space, ensuring the footer stays at the bottom */}
-        <main className="flex-grow mt-14">{children}</main>
+          {/* Main content area grows to fill available space, ensuring the footer stays at the bottom */}
+          <main className="flex-grow mt-14">{children}</main>
 
-        {/* Footer with proper spacing */}
-        <Footer />
+          {/* Footer with proper spacing */}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );
