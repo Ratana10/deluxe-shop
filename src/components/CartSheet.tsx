@@ -24,12 +24,13 @@ const CartSheet = () => {
   );
 
   const onOrder = async () => {
+    const chatId = localStorage.getItem("chatId");
     const res = await fetch("/api/telegram", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({  cart }),
+      body: JSON.stringify({ cart, chatId }),
     });
 
     if (res.ok) {

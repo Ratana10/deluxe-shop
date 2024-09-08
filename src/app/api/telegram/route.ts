@@ -9,7 +9,7 @@ const USER_CHAT_ID = "7116786291"; //Customer's chat id
 
 export async function POST(req: Request, res: Response) {
   try {
-    const { cart, userChartId } = await req.json();
+    const { cart, chatId } = await req.json();
 
     if (!cart) {
       return new Response(JSON.stringify({ message: "missing cart" }), {
@@ -73,13 +73,13 @@ export async function POST(req: Request, res: Response) {
         [
           Markup.button.callback(
             `✅ Confirm`,
-            `confirm_order:${USER_CHAT_ID}:${orderId}`
+            `confirm_order:${chatId}:${orderId}`
           ),
         ],
         [
           Markup.button.callback(
             `❌ Reject`,
-            `reject_order:${USER_CHAT_ID}:${orderId}`
+            `reject_order:${chatId}:${orderId}`
           ),
         ],
       ])
@@ -87,7 +87,7 @@ export async function POST(req: Request, res: Response) {
 
     // Send message to customer
     const customerMsg = await bot.telegram.sendMessage(
-      USER_CHAT_ID, // Customer's Telegram chat ID
+      chatId!, // Customer's Telegram chat ID
       customerMessage,
       Markup.inlineKeyboard([
         [{ text: "🟡 Pending", callback_data: "no_action" }],

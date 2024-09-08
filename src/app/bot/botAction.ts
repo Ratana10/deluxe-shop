@@ -2,7 +2,7 @@ import { getOrderById, updateOrderStatus } from "@/service/order.service";
 import bot from "./bot";
 
 export async function handleConfirmOrder(ctx: any) {
-  const [userId, orderId] = ctx.match.slice(1);
+  const [chatId, orderId] = ctx.match.slice(1);
 
   await ctx.answerCbQuery();
 
@@ -20,12 +20,12 @@ export async function handleConfirmOrder(ctx: any) {
   }
 
   //update customer chat Pending to Confirm
-  await bot.telegram.editMessageReplyMarkup(userId, cusMsgId, undefined, {
+  await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
     inline_keyboard: [[{ text: "🟢 Confirm", callback_data: "no_action" }]],
   });
 
   await bot.telegram.sendMessage(
-    userId,
+    chatId,
     "Your order has been Confirmed by the seller! ✅"
   );
 
@@ -35,7 +35,7 @@ export async function handleConfirmOrder(ctx: any) {
 }
 
 export async function handleRejectOrder(ctx: any) {
-  const [userId, orderId] = ctx.match.slice(1);
+  const [chatId, orderId] = ctx.match.slice(1);
 
   await ctx.answerCbQuery();
 
@@ -51,12 +51,12 @@ export async function handleRejectOrder(ctx: any) {
   }
 
   //update customer chat Pending to Confirm
-  await bot.telegram.editMessageReplyMarkup(userId, cusMsgId, undefined, {
+  await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
     inline_keyboard: [[{ text: "🔴 Rejected", callback_data: "no_action" }]],
   });
 
   await bot.telegram.sendMessage(
-    userId,
+    chatId,
     "Your order has been Rejected by the seller! ❌"
   );
 

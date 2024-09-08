@@ -1,5 +1,3 @@
-import { connectMongoDB } from "../../lib/mongodb";
-import Order from "../../models/Order";
 import { Markup, Telegraf } from "telegraf";
 import { handleConfirmOrder, handleRejectOrder } from "./botAction";
 
@@ -31,10 +29,16 @@ bot.telegram.setChatMenuButton({
   },
 });
 
-bot.start((ctx) => {
+bot.start(async (ctx) => {
   console.log(`Chat ID: ${ctx.chat.id}`);
   const user = ctx.from;
   console.log("User info:", user);
+  const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
+
+  await ctx.reply(
+    "Shopping our website",
+    Markup.inlineKeyboard([[Markup.button.url("Shopping", webUrl)]])
+  );
   ctx.reply("Bot working!");
 });
 
