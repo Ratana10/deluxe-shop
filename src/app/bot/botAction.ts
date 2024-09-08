@@ -57,7 +57,7 @@ export async function handleRejectOrder(ctx: any) {
 
   await bot.telegram.sendMessage(
     userId,
-    "Your order has been Confirmed by the seller! ❌"
+    "Your order has been Rejected by the seller! ❌"
   );
 
   //Update Order Status

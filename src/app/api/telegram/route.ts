@@ -9,7 +9,7 @@ const USER_CHAT_ID = "7116786291"; //Customer's chat id
 
 export async function POST(req: Request, res: Response) {
   try {
-    const { cart } = await req.json();
+    const { cart, userChartId } = await req.json();
 
     if (!cart) {
       return new Response(JSON.stringify({ message: "missing cart" }), {
