@@ -25,15 +25,15 @@ console.log("BOT STARTING updateing");
 
 const bot = new Telegraf(BOT_TOKEN);
 
-bot.telegram.setChatMenuButton({
-  menuButton: {
-    type: "web_app",
-    text: "Order",
-    web_app: {
-      url: WEB_LINK,
-    },
-  },
-});
+// bot.telegram.setChatMenuButton({
+//   menuButton: {
+//     type: "web_app",
+//     text: "Order",
+//     web_app: {
+//       url: WEB_LINK,
+//     },
+//   },
+// });
 
 bot.start(async (ctx) => {
   console.log(`Chat ID: ${ctx.chat.id}`);
@@ -41,10 +41,21 @@ bot.start(async (ctx) => {
   console.log("User info:", user);
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
 
+  bot.telegram.setChatMenuButton({
+    menuButton: {
+      type: "web_app",
+      text: "Order",
+      web_app: {
+        url: webUrl,
+      },
+    },
+  });
+
   await ctx.reply(
     "Shopping our website",
     Markup.inlineKeyboard([[Markup.button.url("Shopping", webUrl)]])
   );
+
   ctx.reply("Bot working!");
 });
 

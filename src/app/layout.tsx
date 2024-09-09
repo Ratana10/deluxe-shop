@@ -5,7 +5,6 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { Toaster } from "react-hot-toast";
-import Script from "next/script";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -26,10 +25,6 @@ export default function RootLayout({
       <head>
         <link rel="icon" type="image/png" href="/sun.png" />
         <meta name="theme-color" content="#360505" />
-        <Script
-          strategy="afterInteractive"
-          src="https://telegram.org/js/telegram-web-app.js"
-        />
       </head>
       <body className={`${lora.className} flex flex-col min-h-screen`}>
         <Toaster />
