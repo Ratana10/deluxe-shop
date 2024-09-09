@@ -52,7 +52,7 @@ bot.start(async (ctx) => {
   });
 
   await ctx.reply(
-    "Shopping our website",
+    "Shopping our website update",
     Markup.inlineKeyboard([[Markup.button.url("Shopping", webUrl)]])
   );
 
