@@ -79,7 +79,14 @@ bot.on("contact", (ctx) => {
 
 // Start the bot if it's not already started
 if (!bot.botInfo) {
-  bot.launch();
+  bot
+    .launch()
+    .then(() => console.log("Bot launched!"))
+    .catch(console.error);
 }
+
+// Graceful stop on termination signals
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
 export default bot;

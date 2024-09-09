@@ -6,11 +6,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     await bot.handleUpdate(body);
-    return NextResponse.json({});
+    return NextResponse.json({ status: 'ok'});
   } catch (error: any) {
     console.error('Error handling webhook:', error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { status: "Internal server error", error },
       { status: 500 }
     );
   }

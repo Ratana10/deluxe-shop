@@ -30,8 +30,7 @@ export async function handleConfirmOrder(ctx: any) {
   );
 
   //Update Order Status
-  await updateOrderStatus(orderId, "Confirmed")
-
+  await updateOrderStatus(orderId, "Confirmed");
 }
 
 export async function handleRejectOrder(ctx: any) {
@@ -61,5 +60,5 @@ export async function handleRejectOrder(ctx: any) {
   );
 
   //Update Order Status
-  await updateOrderStatus(orderId, "Rejected")
+  await updateOrderStatus(orderId, "Rejected");
 }
