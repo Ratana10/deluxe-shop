@@ -1,3 +1,9 @@
+export interface User {
+  chatId: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+}
 
 export interface Product {
   id: string;
@@ -8,29 +14,29 @@ export interface Product {
   status: string;
   images: string[];
   createdAt: string;
-  updatedAt: string; 
+  updatedAt: string;
 }
 
-export interface OrderDetail{
+export interface OrderDetail {
   productId: string;
   name: string;
   quantity: number;
   price: number;
 }
-export interface Order{
+export interface Order {
   userId: string;
   status: string;
   cusMsgId: number;
-  orderDetails: OrderDetail[]
+  orderDetails: OrderDetail[];
 }
-export interface ContactUs{
+export interface ContactUs {
   label: string;
   href: string;
   icon: any;
   src: string;
 }
 
-export interface CartItem{
+export interface CartItem {
   id: string;
   name: string;
   price: number;
@@ -46,4 +52,4 @@ export interface CartContextType {
   decreaseQuantity: (id: string) => void;
   clearCart: () => void;
   totalQuantity: number;
-};
+}

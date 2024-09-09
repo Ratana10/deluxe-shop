@@ -1,6 +1,7 @@
 import { Markup, Telegraf } from "telegraf";
 import { handleConfirmOrder, handleRejectOrder } from "./botAction";
 import dotenv from "dotenv";
+import { saveUser } from "@/service/user.service";
 
 const BOT_TOKEN = "7313219020:AAF78Gg952D3td9LMPw7HsvsIFf_Vls8EmY";
 const WEB_LINK = "https://de-luxe.vercel.app";
@@ -36,10 +37,18 @@ const bot = new Telegraf(BOT_TOKEN);
 // });
 
 bot.start(async (ctx) => {
-  console.log(`Chat ID: ${ctx.chat.id}`);
-  const user = ctx.from;
-  console.log("User info:", user);
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
+  const telegrafUser = ctx.from;
+
+  //save user
+  const userData = {
+    chatId: ctx.chat.id,
+    username: telegrafUser.username || "",
+    firstName: telegrafUser.first_name || "",
+    lastName: telegrafUser.last_name || "",
+  };
+
+  await saveUser(userData);
 
   bot.telegram.setChatMenuButton({
     menuButton: {
