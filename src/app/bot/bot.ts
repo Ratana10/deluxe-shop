@@ -3,18 +3,12 @@ import { handleConfirmOrder, handleRejectOrder } from "./botAction";
 import dotenv from "dotenv";
 import { saveUser } from "@/service/user.service";
 
-const BOT_TOKEN = "7313219020:AAF78Gg952D3td9LMPw7HsvsIFf_Vls8EmY";
-const WEB_LINK = "https://de-luxe.vercel.app";
-const WEBHOOK_URL = "https://de-luxe.vercel.app/api/webhook";
-
-const TELEGRAM_CHAT_ID = "1042969274";
-const USER_CHAT_ID = "7116786291";
-
-const ratanak = "7116786291";
-const ratana = "1042969274";
-
 // Load environment variables from .env
 dotenv.config();
+
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const WEB_LINK = process.env.NEXT_PUBLIC_API_BASE_URL;
+const WEBHOOK_URL = `${WEB_LINK}/api/webhook`;
 
 console.log("BOT TOKEN", BOT_TOKEN);
 
@@ -25,16 +19,6 @@ if (!BOT_TOKEN) {
 console.log("BOT STARTING updateing");
 
 const bot = new Telegraf(BOT_TOKEN);
-
-// bot.telegram.setChatMenuButton({
-//   menuButton: {
-//     type: "web_app",
-//     text: "Order",
-//     web_app: {
-//       url: WEB_LINK,
-//     },
-//   },
-// });
 
 bot.start(async (ctx) => {
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
@@ -63,7 +47,7 @@ bot.start(async (ctx) => {
   });
 
   await ctx.reply(
-    `Shopping our website update +${msg}`,
+    `Let's get Order 🛒 `,
     Markup.inlineKeyboard([[Markup.button.url("Shopping", webUrl)]])
   );
 
