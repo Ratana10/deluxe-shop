@@ -1,13 +1,19 @@
 import { Markup, Telegraf } from "telegraf";
 import { handleConfirmOrder, handleRejectOrder } from "./botAction";
+import dotenv from "dotenv";
 
 const BOT_TOKEN = "7313219020:AAF78Gg952D3td9LMPw7HsvsIFf_Vls8EmY";
 const WEB_LINK = "https://de-luxe.vercel.app";
+const WEBHOOK_URL = "https://de-luxe.vercel.app/api/webhook";
+
 const TELEGRAM_CHAT_ID = "1042969274";
 const USER_CHAT_ID = "7116786291";
 
 const ratanak = "7116786291";
 const ratana = "1042969274";
+
+// Load environment variables from .env
+dotenv.config();
 
 console.log("BOT TOKEN", BOT_TOKEN);
 
@@ -77,16 +83,37 @@ bot.on("contact", (ctx) => {
   ctx.reply(`Thank you! We received your phone number: ${phoneNumber}`);
 });
 
-// Start the bot if it's not already started
-if (!bot.botInfo) {
+// Set the webhook only in production and avoid during build
+if (process.env.NODE_ENV === "production") {
+  if (process.env.WEBHOOK_URL) {
+    // Ensure this is only run once when the app is live
+    bot.telegram
+      .setWebhook(`${process.env.WEBHOOK_URL}`)
+      .then(() => console.log("Webhook set successfully!"))
+      .catch((err) => {
+        if (err.response && err.response.error_code === 429) {
+          const retryAfter = err.response.parameters.retry_after;
+          console.error(`Too Many Requests: retry after ${retryAfter} seconds`);
+          setTimeout(() => {
+            bot.telegram.setWebhook(WEBHOOK_URL).catch(console.error);
+          }, retryAfter * 1000);
+        } else {
+          console.error("Failed to set webhook:", err);
+        }
+      });
+  } else {
+    console.error("WEBHOOK_URL is not defined.");
+  }
+} else {
+  // In development or non-production, use long polling
   bot
     .launch()
-    .then(() => console.log("Bot launched!"))
+    .then(() => console.log("Bot launched in development mode!"))
     .catch(console.error);
 }
 
 // Graceful stop on termination signals
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
 export default bot;
