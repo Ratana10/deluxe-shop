@@ -2,7 +2,7 @@ import { User } from "@/types"
 
 export const saveUser = async (user: User) => {
   try {
-    const res = await fetch(`/api/users`,{
+    const res = await fetch(`https://de-luxe.vercel.app/api/users`,{
       method:"POST",
       headers:{
         'Content-Type': 'application/json',
