@@ -6,25 +6,45 @@ import { useSearchParams } from "next/navigation";
 
 const Client = () => {
   const searchParams = useSearchParams();
-  const chatId = searchParams.get("chat_id");
+  const chatIdFromParams = searchParams.get("chat_id");
 
   useEffect(() => {
-    // Check if the Telegram WebApp API is available
-    if (window.Telegram && window.Telegram.WebApp) {
-      const { user } = window.Telegram.WebApp.initDataUnsafe;
+    // Function to get chatId from Telegram WebApp API
+    const getTelegramChatId = (): string | null => {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const { user } = window.Telegram.WebApp.initDataUnsafe;
 
-      // Check if chatId exists in Telegram's initDataUnsafe
-      if (user?.id) {
-        const chatId = user.id.toString(); // Convert chatId to string
-        console.log("chat id", chatId);
-        localStorage.setItem("chatId", chatId); // Store chatId in localStorage
-      } else {
-        console.error("Chat ID not available.");
+        if (user?.id) {
+          const chatId = user.id.toString();
+          console.log("Telegram WebApp chat id:", chatId);
+          return chatId;
+        }
+      }
+      console.error("Telegram WebApp is not available or chat_id is missing.");
+      return null;
+    };
+
+    // Check if chatId exists in searchParams
+    if (chatIdFromParams) {
+      console.log("Chat ID from search params:", chatIdFromParams);
+      localStorage.setItem("chatId", chatIdFromParams); // Store chatId from search params
+    } else {
+      // If no chatId in searchParams, use Telegram WebApp API
+      const telegramChatId = getTelegramChatId();
+      if (telegramChatId) {
+        localStorage.setItem("chatId", telegramChatId); // Store chatId from Telegram WebApp API
       }
     }
-  }, []); // Empty dependency array to run only once when the component mounts
+  }, [chatIdFromParams]);
 
-  return <Hero />;
+  const id = localStorage.getItem("chatId")
+
+  // return <Hero />;
+  return (
+    <>
+    <h1 className="mt-16 text-3xl">Your chat id ${id}</h1>
+    </>
+  )
 };
 
 export default Client;

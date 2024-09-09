@@ -74,7 +74,7 @@ const CartSheet = () => {
         {/* Sheet for Cart */}
         <SheetContent
           side="right"
-          className="w-[375px] sm:w-[540px] p-6 bg-white shadow-lg"
+          className="w-[90vw] sm:w-[520px] max-h-screen overflow-y-auto p-6 bg-white shadow-lg"
         >
           <div>
             {/* Cart Header */}
