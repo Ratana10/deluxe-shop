@@ -7,7 +7,6 @@ import { useSearchParams } from "next/navigation";
 const Client = () => {
   const searchParams = useSearchParams();
   const chatIdFromParams = searchParams.get("chat_id");
-  let testChatId : string | null = "";
 
   useEffect(() => {
     // Function to get chatId from Telegram WebApp API
@@ -37,13 +36,12 @@ const Client = () => {
       }
     }
 
-    testChatId = localStorage.getItem("chatId");
   }, [chatIdFromParams]);
 
   // return <Hero />;
   return (
     <>
-      <h1 className="mt-16 text-3xl">Your chat id ${testChatId}</h1>
+      <h1 className="mt-16 text-3xl">Your chat id</h1>
     </>
   );
 };
