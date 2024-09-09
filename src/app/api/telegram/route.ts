@@ -4,8 +4,6 @@ import dedent from "dedent";
 import { createOrder, updateCustomerMessageId } from "@/service/order.service";
 import { format } from "date-fns";
 
-const TELEGRAM_CHAT_ID = "1042969274"; //Seller's chat ID
-const USER_CHAT_ID = "7116786291"; //Customer's chat id
 
 export async function POST(req: Request, res: Response) {
   try {
@@ -18,7 +16,7 @@ export async function POST(req: Request, res: Response) {
     }
 
     //Save cart into db
-    const orderId = await createOrder(USER_CHAT_ID, cart);
+    const orderId = await createOrder(chatId, cart);
 
     const formattedCartItems = cart
       .map(
@@ -67,7 +65,7 @@ export async function POST(req: Request, res: Response) {
 
     // Send message to seller with confirmation buttons
     await bot.telegram.sendMessage(
-      TELEGRAM_CHAT_ID!, // Seller's chat ID from environment variables
+      process.env.TELEGRAM_CHAT_ID!, // Seller's chat ID from environment variables
       sellerMessage,
       Markup.inlineKeyboard([
         [

@@ -10,13 +10,11 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_LINK = process.env.NEXT_PUBLIC_API_BASE_URL;
 const WEBHOOK_URL = `${WEB_LINK}/api/webhook`;
 
-console.log("BOT TOKEN", BOT_TOKEN);
-
 if (!BOT_TOKEN) {
   throw new Error("TELEGRAM_BOT_TOKEN is required");
 }
 
-console.log("BOT STARTING updateing");
+console.log("BOT Starting...")
 
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -47,11 +45,9 @@ bot.start(async (ctx) => {
   });
 
   await ctx.reply(
-    `Let's get Order 🛒 `,
-    Markup.inlineKeyboard([[Markup.button.url("Shopping", webUrl)]])
+    `Let's get Order ⭐`,
+    Markup.inlineKeyboard([[Markup.button.url("Order", webUrl)]])
   );
-
-  ctx.reply("Bot working!");
 });
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
