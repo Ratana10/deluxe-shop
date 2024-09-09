@@ -12,6 +12,7 @@ import Image from "next/image";
 import { Minus, Plus, ShoppingCart, Trash } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { CartItem } from "@/types";
+import { toast } from "react-hot-toast";
 
 const CartSheet = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,19 +26,32 @@ const CartSheet = () => {
 
   const onOrder = async () => {
     const chatId = localStorage.getItem("chatId");
-    const res = await fetch("/api/telegram", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ cart, chatId }),
-    });
 
-    if (res.ok) {
-      alert("Order placed successfully!");
-    } else {
-      alert("Order fail!");
+    if (!cart || cart.length === 0) {
+      toast.error("Your cart is empty");
+      return;
     }
+
+    toast.promise(
+      fetch("/api/telegram", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cart, chatId }),
+      }).then(async (res) => {
+        if (res.ok) {
+          clearCart(); //Clear cart on success
+        } else {
+          throw new Error("Order fail");
+        }
+      }),
+      {
+        loading: "Loading ...",
+        success: "Order Placed successfully",
+        error: "Order failed! Please try again.",
+      }
+    );
   };
 
   return (

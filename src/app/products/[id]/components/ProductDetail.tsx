@@ -16,6 +16,7 @@ import BackButton from "@/components/BackButton";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "@/app/context/CartContext";
+import { toast } from "react-hot-toast";
 
 interface Props {
   product: Product;
@@ -46,8 +47,9 @@ const ProductDetail = ({ product }: Props) => {
     };
 
     addToCart(cartItem);
+    toast.success(`Added to cart!`);
   };
-  
+
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: {

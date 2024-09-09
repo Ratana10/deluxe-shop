@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
-
+import { Toaster  } from "react-hot-toast"
 const lora = Lora({
   subsets: ["latin"],
 });
@@ -26,6 +26,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#360505" />
       </head>
       <body className={`${lora.className} flex flex-col min-h-screen`}>
+        <Toaster />
         {/* Header should stay at the top */}
         <CartProvider>
           <Header />
