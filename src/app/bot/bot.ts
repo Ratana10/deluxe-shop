@@ -48,7 +48,9 @@ bot.start(async (ctx) => {
     lastName: telegrafUser.last_name || "",
   };
 
-  await saveUser(userData);
+  const result = await saveUser(userData);
+  const msg = result?.message || "No msg";
+  console.log(msg);
 
   bot.telegram.setChatMenuButton({
     menuButton: {
@@ -61,7 +63,7 @@ bot.start(async (ctx) => {
   });
 
   await ctx.reply(
-    "Shopping our website update",
+    `Shopping our website update +${msg}`,
     Markup.inlineKeyboard([[Markup.button.url("Shopping", webUrl)]])
   );
 

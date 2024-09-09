@@ -19,7 +19,7 @@ export const saveUser = async (user: User) => {
     console.log("data", data);
 
     return {
-      message: data
+      message: data.message
     }
   } catch (error) {
     
