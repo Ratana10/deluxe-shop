@@ -1,5 +1,9 @@
 import { Markup, Telegraf } from "telegraf";
-import { handleConfirmOrder, handleRejectOrder } from "./botAction";
+import {
+  handleConfirmOrder,
+  handlePhotoUpload,
+  handleRejectOrder,
+} from "./botAction";
 import dotenv from "dotenv";
 import { saveUser } from "@/service/user.service";
 
@@ -9,12 +13,13 @@ dotenv.config();
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_LINK = process.env.NEXT_PUBLIC_API_BASE_URL;
 const WEBHOOK_URL = `${WEB_LINK}/api/webhook`;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 if (!BOT_TOKEN) {
   throw new Error("TELEGRAM_BOT_TOKEN is required");
 }
 
-console.log("BOT Starting...")
+console.log("BOT Starting...");
 
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -56,6 +61,14 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
 
 bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   await handleRejectOrder(ctx);
+});
+
+bot.on("photo", async (ctx) => {
+  if (!TELEGRAM_CHAT_ID) {
+    throw new Error("error");
+  }
+
+  await handlePhotoUpload(ctx, TELEGRAM_CHAT_ID);
 });
 
 //Ask user to share Location
