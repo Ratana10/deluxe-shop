@@ -79,9 +79,9 @@ export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
     const fileUrl = await ctx.telegram.getFileLink(fileId);
 
     //Define the file name and path
-    const fileName = `${fileId}.jpg`;
+    // const fileName = `${fileId}.jpg`;
 
-    const filePath = path.resolve(__dirname, fileName);
+    // const filePath = path.resolve(__dirname, fileName);
 
     //Download the image using the fetch API
     const res = await fetch(fileUrl.href);
@@ -92,23 +92,17 @@ export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
       );
     }
 
-    // Read the response as an arrayBuffer
-    const buffer = await res.arrayBuffer();
-
-    //Write the buffer to a local file
-    fs.writeFileSync(filePath, Buffer.from(buffer));
+    const buffer = Buffer.from(await res.arrayBuffer())
 
     //Forward the image to the seller after saving
     await ctx.telegram.sendPhoto(
       sellerChatId,
-      { source: filePath },
+      { source: buffer },
       {
         caption: `New transaction receipt from username: ${ctx.message?.from?.first_name}`,
       }
     );
 
-    //Clean up: Remove the local file after sending
-    fs.unlinkSync(filePath);
   } catch (error) {
     console.error("Error handling photo:", error);
     await ctx.reply(
