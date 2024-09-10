@@ -5,6 +5,7 @@ interface UserDocument extends Document {
   firstName: string;
   lastName: string;
   chatId: number;
+  botUsed: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,7 +15,8 @@ const UserSchema: Schema = new Schema(
     username: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    chatId: { type: Number, required: true },
+    chatId: { type: Number, required: true, unique: true },
+    botUsed: { type: Number, default: 1 },
   },
   {
     timestamps: true,

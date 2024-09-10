@@ -11,6 +11,8 @@ export async function POST(req: NextRequest) {
     const existingUser = await User.findOne({ chatId });
 
     if (existingUser) {
+      existingUser.botUsed = existingUser.botUsed + 1;
+      await existingUser.save();
       return NextResponse.json({ message: "User already exists" });
     }
 
@@ -19,6 +21,7 @@ export async function POST(req: NextRequest) {
       username,
       firstName,
       lastName,
+      botUsed: 1,
     });
 
     await newUser.save();
