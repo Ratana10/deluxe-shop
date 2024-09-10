@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/carousel";
 import { Product } from "@/types";
 import BackButton from "@/components/BackButton";
-import { useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "@/app/context/CartContext";
 import { toast } from "react-hot-toast";
@@ -77,6 +77,30 @@ const ProductDetail = ({ product }: Props) => {
     },
   };
 
+  const handleKeyDown = useCallback((event: globalThis.KeyboardEvent) => {
+    if (!isModalOpen) {
+      if (event.key === "ArrowLeft") {
+        document.getElementById("carousel-previous")?.click();
+      } else if (event.key === "ArrowRight") {
+        document.getElementById("carousel-next")?.click();
+      }
+    } else {
+      if (event.key === "ArrowLeft") {
+        document.getElementById("carousel-previous-modal")?.click();
+      } else if (event.key === "ArrowRight") {
+        document.getElementById("carousel-next-modal")?.click();
+      }
+    }
+  },[isModalOpen]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      // Clean up the event listener on component unmount
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Back Button */}
@@ -112,8 +136,14 @@ const ProductDetail = ({ product }: Props) => {
               ))}
             </CarouselContent>
             {/* Carousel Navigation Buttons */}
-            <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition" />
-            <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition" />
+            <CarouselPrevious
+              id="carousel-previous"
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition"
+            />
+            <CarouselNext
+              id="carousel-next"
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition"
+            />
           </Carousel>
         </motion.div>
 
@@ -202,8 +232,14 @@ const ProductDetail = ({ product }: Props) => {
                       ))}
                     </CarouselContent>
                     {/* Carousel Navigation Buttons in Modal */}
-                    <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition" />
-                    <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition" />
+                    <CarouselPrevious
+                      id="carousel-previous-modal"
+                      className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition"
+                    />
+                    <CarouselNext
+                      id="carousel-next-modal"
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition"
+                    />
                   </Carousel>
 
                   {/* Close Button */}
