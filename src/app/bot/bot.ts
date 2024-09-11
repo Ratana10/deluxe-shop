@@ -53,20 +53,6 @@ bot.start(async (ctx) => {
     }! ⭐\nReady to place an order!!`,
     Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
   );
-
-  bot.telegram.setChatMenuButton({
-    menuButton: {
-      type: "web_app",
-      text: "Order",
-      web_app: {
-        url: webUrl,
-      },
-    },
-  });
-
-  // await ctx.reply(
-  //   `អ្នកអាច​ Order តាមរយះ Website រឺButton Orderនៅខាងក្រោម ខាងឆ្វេង`
-  // );
 });
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
