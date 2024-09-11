@@ -3,7 +3,7 @@ import { Markup } from "telegraf";
 import dedent from "dedent";
 import { createOrder, updateCustomerMessageId } from "@/service/order.service";
 import { format } from "date-fns";
-
+import User from "@/models/User";
 
 export async function POST(req: Request, res: Response) {
   try {
@@ -37,6 +37,10 @@ export async function POST(req: Request, res: Response) {
 
     const currentDate = format(new Date(), "MM-dd-yyyy hh:mm:ss a");
 
+    const user = await User.findOne({ chatId });
+
+    console.log("user ", user);
+
     // Seller message
     const sellerMessage = dedent(
       `
@@ -46,7 +50,10 @@ export async function POST(req: Request, res: Response) {
       📦 Order ID: ${orderId}
       📅 Date: ${currentDate}
 
-      📞 Contact Seller: 0964347813
+      👤 UserDetail
+      username: ${user.username}
+      firstname: ${user.firstName}
+      lastname: ${user.lastName}
       `
     );
 
@@ -60,6 +67,7 @@ export async function POST(req: Request, res: Response) {
       📅 Date: ${currentDate}
 
       📞 Contact Seller: 0964347813
+      Please wait ...
         `
     );
 
@@ -70,14 +78,12 @@ export async function POST(req: Request, res: Response) {
       Markup.inlineKeyboard([
         [
           Markup.button.callback(
-            `✅ Confirm`,
-            `confirm_order:${chatId}:${orderId}`
-          ),
-        ],
-        [
-          Markup.button.callback(
             `❌ Reject`,
             `reject_order:${chatId}:${orderId}`
+          ),
+          Markup.button.callback(
+            `✅ Confirm`,
+            `confirm_order:${chatId}:${orderId}`
           ),
         ],
       ])

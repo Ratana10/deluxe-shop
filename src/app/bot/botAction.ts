@@ -1,6 +1,6 @@
 import { getOrderById, updateOrderStatus } from "@/service/order.service";
 import bot from "./bot";
-import { Context } from "telegraf";
+import { Context, Markup } from "telegraf";
 import path from "path";
 import fs from "fs";
 
@@ -27,9 +27,23 @@ export async function handleConfirmOrder(ctx: any) {
     inline_keyboard: [[{ text: "🟢 Confirm", callback_data: "no_action" }]],
   });
 
+  // await bot.telegram.sendMessage(
+  //   chatId,
+  //   "Your order has been Confirmed by the seller! ✅"
+  // );
+
   await bot.telegram.sendMessage(
-    chatId,
-    "Your order has been Confirmed by the seller! ✅"
+    chatId!, // Customer's Telegram chat ID
+    `បងចង់ pay ប្រាក់តាមរបៀបណា`,
+    Markup.inlineKeyboard([
+      [
+        {
+          text: "🚚 Pay via Delivery",
+          callback_data: `pay_delivery:${chatId}:${orderId}`,
+        },
+        { text: "🏦 Pay via Bank", callback_data: `pay_bank:${chatId}:${orderId}` },
+      ],
+    ])
   );
 
   //Update Order Status
@@ -109,4 +123,9 @@ export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
       "There was an error processing your image. Please try again."
     );
   }
+}
+
+
+export const handlePaymentQr = () => {
+
 }

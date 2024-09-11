@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
 
     if (existingUser) {
       existingUser.botUsed = existingUser.botUsed + 1;
-      console.log("User already exists");
       await existingUser.save();
       return NextResponse.json({ message: "User already exists" });
     }

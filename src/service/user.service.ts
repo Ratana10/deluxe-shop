@@ -25,3 +25,11 @@ export const saveUser = async (user: User) => {
     };
   } catch (error) {}
 };
+
+export const getUserByChatId = (chatId: string) =>{
+  try {
+    
+  } catch (error) {
+    
+  }
+}
