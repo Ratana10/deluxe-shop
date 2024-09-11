@@ -77,21 +77,24 @@ const ProductDetail = ({ product }: Props) => {
     },
   };
 
-  const handleKeyDown = useCallback((event: globalThis.KeyboardEvent) => {
-    if (!isModalOpen) {
-      if (event.key === "ArrowLeft") {
-        document.getElementById("carousel-previous")?.click();
-      } else if (event.key === "ArrowRight") {
-        document.getElementById("carousel-next")?.click();
+  const handleKeyDown = useCallback(
+    (event: globalThis.KeyboardEvent) => {
+      if (!isModalOpen) {
+        if (event.key === "ArrowLeft") {
+          document.getElementById("carousel-previous")?.click();
+        } else if (event.key === "ArrowRight") {
+          document.getElementById("carousel-next")?.click();
+        }
+      } else {
+        if (event.key === "ArrowLeft") {
+          document.getElementById("carousel-previous-modal")?.click();
+        } else if (event.key === "ArrowRight") {
+          document.getElementById("carousel-next-modal")?.click();
+        }
       }
-    } else {
-      if (event.key === "ArrowLeft") {
-        document.getElementById("carousel-previous-modal")?.click();
-      } else if (event.key === "ArrowRight") {
-        document.getElementById("carousel-next-modal")?.click();
-      }
-    }
-  },[isModalOpen]);
+    },
+    [isModalOpen]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -157,16 +160,28 @@ const ProductDetail = ({ product }: Props) => {
 
             {/* Product Description */}
             <div className="my-6">
-              <h3 className="text-lg font-semibold mb-2">Description:</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold">Description:</h3>
               <p className="text-gray-600 text-md sm:text-lg">
                 {product.description}
               </p>
             </div>
 
             {/*  Color Display */}
-            <div className="flex items-center mt-4">
-              <span className="text-sm font-medium mr-2">Color:</span>
-              <Badge>{product.color}</Badge>
+            <div className="">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold">Color:</span>
+
+              <div className="flex items-center space-x-2">
+                {/* Display color name */}
+                <span className="text-gray-600  text-md sm:text-lg">
+                  {product.color}
+                </span>
+
+                {/* Circle with dynamic color */}
+                <span
+                  className="inline-block w-4 h-4 rounded-full"
+                  style={{ backgroundColor: product.color.toLowerCase() }} // Dynamic color
+                ></span>
+              </div>
             </div>
 
             {/* Product Status */}
@@ -185,9 +200,13 @@ const ProductDetail = ({ product }: Props) => {
 
             {/* Price Section */}
             <div className="flex items-center justify-between mt-2">
-              <Label className="text-2xl font-bold text-gray-800">
-                <span className="">Price:</span>
-                <span className=" ml-2">${product.price}</span>
+              <Label className="text-gray-800">
+                <span className="text-lg sm:text-xl md:text-2xl font-bold">
+                  Price:
+                </span>
+                <span className="ml-2 text-lg sm:text-xl md:text-2xl font-bold">
+                  ${product.price}
+                </span>
               </Label>
               <button
                 className="btn-primary"

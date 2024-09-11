@@ -46,7 +46,7 @@ export default function Footer() {
 
         <div className="mb-4 sm:mb-0 sm:w-1/3 text-center">
           <p className="text-sm">
-            © Copyright ${setting.logoName}. All Rights Reserved.
+            © Copyright {setting.logoName}. All Rights Reserved.
           </p>
         </div>
 

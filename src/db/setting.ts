@@ -1,3 +1,3 @@
 export const setting = {
-  logoName: "Testing",
+  logoName: "Deluxe",
 };

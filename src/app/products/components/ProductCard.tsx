@@ -56,10 +56,16 @@ export function ProductCard({ product }: Props) {
             ${product.price.toFixed(2)}
           </span>
 
-          {/* View Detail Button */}
-          <Link href={`/products/${product.id}`} className="ml-auto">
-            <button className="btn-primary">View Detail</button>
-          </Link>
+          {/* Stock Status */}
+          <span
+            className={`ml-auto px-2 rounded-sm ${
+              product.status === "Available"
+                ? "bg-[#AB8529] text-white"
+                : "bg-[#660404] text-white"
+            }`}
+          >
+            {product.status === "Available" ? "Available" : "Out of Stock"}
+          </span>
         </div>
       </div>
     </motion.div>
