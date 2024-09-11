@@ -5,7 +5,9 @@ import Link from "next/link";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Navbar, { navbars } from "./Navbar";
@@ -35,15 +37,15 @@ export default function Header() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-6 bg-white">
-              <nav>
-                {/* Center the Deluxe link */}
-                <li className="flex justify-center">
-                  {/* Use flex and justify-center to center the Deluxe link */}
-                  <Link href="/" className="text-2xl font-bold text-[#660404]">
-                    {setting.logoName}
-                  </Link>
-                </li>
-                <ul className="space-y-4">
+              <SheetHeader>
+                <SheetTitle className="text-2xl text-center font-bold text-[#660404]">
+                  {setting.logoName}
+                </SheetTitle>
+                <SheetDescription className="mb-4 text-gray-500">
+                </SheetDescription>
+              </SheetHeader>
+              <nav className="mt-4">
+                <ul className="space-y-6">
                   {navbars.map((nav) => (
                     <li key={nav.id}>
                       <Link

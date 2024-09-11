@@ -3,7 +3,10 @@
 import { useState } from "react";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
+  SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -16,6 +19,8 @@ import { toast } from "react-hot-toast";
 
 const CartSheet = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { totalQuantity, cart, clearCart, increaseQuantity, decreaseQuantity } =
     useCart();
 
@@ -29,6 +34,14 @@ const CartSheet = () => {
 
     if (!cart || cart.length === 0) {
       toast.error("Your cart is empty");
+      return;
+    }
+
+    const isConfirmed = window.confirm(
+      "Are you sure you want to place the order?"
+    );
+
+    if (!isConfirmed) {
       return;
     }
 
@@ -74,20 +87,21 @@ const CartSheet = () => {
         {/* Sheet for Cart */}
         <SheetContent
           side="right"
-          className="w-[90vw] sm:w-[520px] max-h-screen overflow-y-auto p-6 bg-white shadow-lg"
+          className="w-[85vw] sm:w-[520px] max-h-screen overflow-y-auto p-4 bg-white shadow-lg"
         >
           <div>
             {/* Cart Header */}
             <SheetHeader>
-              <SheetTitle className="text-start border-b pb-4 mb-4">
-                Your Cart
-              </SheetTitle>
+              <SheetTitle className="text-start">Your Cart</SheetTitle>
+              <SheetDescription className="text-start border-b pb-4">
+                You can view and manage items before placing an order
+              </SheetDescription>
             </SheetHeader>
             {/* If cart is empty */}
             {cart.length === 0 ? (
-              <p className="text-center">Your cart is empty</p>
+              <p className="text-center my-4">Your cart is empty</p>
             ) : (
-              <ul className="space-y-4">
+              <ul className="space-y-4 mt-4">
                 {/* Cart item design */}
                 {cart.map((item: CartItem, index: number) => (
                   <div
@@ -95,16 +109,17 @@ const CartSheet = () => {
                     className="flex justify-between items-center"
                   >
                     <div className="flex items-center">
-                      <div className="relative w-16 h-12">
+                      <div className="relative w-14 sm:w-16 h-10 sm:h-12">
                         <Image
                           src={item.image} // Replace with actual product image
                           alt={item.name}
                           fill
                           className="rounded-lg object-cover"
+                          priority
                         />
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-base font-semibold sm:text-sm">
+                        <h3 className="text-sm font-semibold sm:text-base">
                           {item.name}
                         </h3>
                         <div className="flex justify-between items-center">
@@ -139,21 +154,28 @@ const CartSheet = () => {
               </ul>
             )}
 
-            {/* Total Price & Actions */}
+            {/* Total Price */}
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total</span>
                 <span>${totalPrice.toFixed(2)}</span>{" "}
               </div>
             </div>
-
-            <button className="btn-primary w-full mt-3" onClick={onOrder}>
-              Place Order
-            </button>
+          </div>
+          <SheetFooter className="">
+            <SheetClose asChild>
+              <button
+                className={`btn-primary w-full mt-3`}
+                onClick={onOrder}
+                disabled={cart.length === 0}
+              >
+                Place Order
+              </button>
+            </SheetClose>
             <button className=" w-full mt-3 btn-secondary" onClick={clearCart}>
               Clear Cart
             </button>
-          </div>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </>
