@@ -7,6 +7,8 @@ import {
 import dotenv from "dotenv";
 import { saveUser } from "@/service/user.service";
 import path from "path";
+import { PaymentStatus } from "@/types/enums";
+import { updatePaymentStatus } from "@/service/bot/order.service";
 
 // Load environment variables from .env
 dotenv.config();
@@ -101,7 +103,6 @@ bot.action(/confirm_payment:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
 
   await ctx.reply(`សូមបងជួយសេន Transaction ដែលបងបានបង់`);
-  
 
   // Set up listener for photo upload
   bot.on("photo", async (ctx) => {
@@ -146,7 +147,11 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
     ],
   });
 
+  console.log("ChatID", chatId);
+  console.log("OrderID", orderId);
+
   // Find the order in the database
+  const order = await updatePaymentStatus(orderId, PaymentStatus.COMPLETED);
 
   // Notify the customer that the payment has been verified
   await ctx.telegram.sendMessage(

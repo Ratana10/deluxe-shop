@@ -3,6 +3,7 @@ import bot from "./bot";
 import { Context, Markup } from "telegraf";
 import path from "path";
 import fs from "fs";
+import { OrderStatus } from "@/types/enums";
 
 export async function handleConfirmOrder(ctx: any) {
   const [chatId, orderId] = ctx.match.slice(1);
@@ -41,13 +42,16 @@ export async function handleConfirmOrder(ctx: any) {
           text: "🚚 Pay via Delivery",
           callback_data: `pay_delivery:${chatId}:${orderId}`,
         },
-        { text: "🏦 Pay via Bank", callback_data: `pay_bank:${chatId}:${orderId}` },
+        {
+          text: "🏦 Pay via Bank",
+          callback_data: `pay_bank:${chatId}:${orderId}`,
+        },
       ],
     ])
   );
 
   //Update Order Status
-  await updateOrderStatus(orderId, "Confirmed");
+  await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
 }
 
 export async function handleRejectOrder(ctx: any) {
@@ -77,7 +81,7 @@ export async function handleRejectOrder(ctx: any) {
   );
 
   //Update Order Status
-  await updateOrderStatus(orderId, "Rejected");
+  await updateOrderStatus(orderId, OrderStatus.REJECTED);
 }
 
 export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
@@ -106,7 +110,7 @@ export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
       );
     }
 
-    const buffer = Buffer.from(await res.arrayBuffer())
+    const buffer = Buffer.from(await res.arrayBuffer());
 
     //Forward the image to the seller after saving
     await ctx.telegram.sendPhoto(
@@ -116,7 +120,6 @@ export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
         caption: `New transaction receipt from username: ${ctx.message?.from?.first_name}`,
       }
     );
-
   } catch (error) {
     console.error("Error handling photo:", error);
     await ctx.reply(
@@ -125,7 +128,4 @@ export async function handlePhotoUpload(ctx: any, sellerChatId: string) {
   }
 }
 
-
-export const handlePaymentQr = () => {
-
-}
+export const handlePaymentQr = () => {};

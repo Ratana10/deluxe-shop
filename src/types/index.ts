@@ -24,9 +24,10 @@ export interface OrderDetail {
   quantity: number;
   price: number;
 }
+
 export interface Order {
   chatId: string;
-  status: string;
+  orderStatus: string;
   cusMsgId: number;
   orderDetails: OrderDetail[];
 }

@@ -2,6 +2,7 @@ import { connectMongoDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
 import OrderDetail from "@/models/OrderDetail";
 import { CartItem } from "@/types";
+import { OrderStatus, PaymentStatus } from "@/types/enums";
 
 export async function createOrder(
   chatId: string,
@@ -17,8 +18,9 @@ export async function createOrder(
 
     const order = new Order({
       chatId,
-      status: "Pending",
+      orderStatus: OrderStatus.PENDING,
       total: totalPrice,
+      paymentStaus: PaymentStatus.PENDING,
     });
 
     const savedOrder = await order.save();
@@ -74,7 +76,26 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { status: status },
+    { orderStatus: status },
+    { new: true }
+  );
+
+  if (!updatedOrder) {
+    throw new Error("Order not found");
+  }
+
+  return updatedOrder;
+}
+
+export async function updatePaymentStatus(
+  orderId: string,
+  paymentStatus: PaymentStatus
+) {
+  await connectMongoDB();
+
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { paymentStatus: paymentStatus },
     { new: true }
   );
 

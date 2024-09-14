@@ -70,7 +70,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { status: status },
+    { orderStatus: status },
     { new: true }
   );
 
