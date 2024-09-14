@@ -1,6 +1,6 @@
-import { User } from "@/types";
+import { Customer } from "@/types";
 
-export const saveUser = async (user: User) => {
+export const saveUser = async (user: Customer) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users`,
@@ -26,10 +26,7 @@ export const saveUser = async (user: User) => {
   } catch (error) {}
 };
 
-export const getUserByChatId = (chatId: string) =>{
+export const getUserByChatId = (chatId: string) => {
   try {
-    
-  } catch (error) {
-    
-  }
-}
+  } catch (error) {}
+};

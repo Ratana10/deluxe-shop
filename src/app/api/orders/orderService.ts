@@ -3,7 +3,10 @@ import Order from "@/models/Order";
 import OrderDetail from "@/models/OrderDetail";
 import { CartItem } from "@/types";
 
-export async function createOrder(userId: string, cart: CartItem[]): Promise<string> {
+export async function createOrder(
+  chatId: string,
+  cart: CartItem[]
+): Promise<string> {
   try {
     await connectMongoDB();
 
@@ -13,7 +16,7 @@ export async function createOrder(userId: string, cart: CartItem[]): Promise<str
     );
 
     const order = new Order({
-      userId: userId,
+      chatId,
       status: "Pending",
       total: totalPrice,
     });
@@ -43,7 +46,6 @@ export async function createOrder(userId: string, cart: CartItem[]): Promise<str
     return "";
   }
 }
-
 
 export async function updateCustomerMessageId(
   orderId: string,
@@ -82,4 +84,3 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
   return updatedOrder;
 }
-

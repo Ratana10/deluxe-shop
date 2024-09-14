@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 interface OrderDocument extends Document {
-  userId: string;
+  chatId: string;
   cusMsgId: number;
   status: string;
   total: number;
@@ -12,7 +12,7 @@ interface OrderDocument extends Document {
 
 const OrderSchema: Schema = new Schema(
   {
-    userId: { type: String, required: true },
+    chatId: { type: String, required: true },
     cusMsgId: { type: Number, required: false },
     status: { type: String, default: "Pending" },
     total: { type: Number, required: false },

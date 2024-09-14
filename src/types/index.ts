@@ -1,4 +1,4 @@
-export interface User {
+export interface Customer {
   chatId: number;
   username: string;
   firstName: string;
@@ -25,7 +25,7 @@ export interface OrderDetail {
   price: number;
 }
 export interface Order {
-  userId: string;
+  chatId: string;
   status: string;
   cusMsgId: number;
   orderDetails: OrderDetail[];

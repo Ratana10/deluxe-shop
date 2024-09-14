@@ -25,12 +25,9 @@ console.log("BOT Starting...");
 const bot = new Telegraf(BOT_TOKEN);
 
 bot.start(async (ctx) => {
-
-  
   // Simulate typing to make it feel more interactive
   await ctx.sendChatAction("typing");
   await new Promise((resolve) => setTimeout(resolve, 1000)); //Wait 1 second
-
 
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
   const telegrafUser = ctx.from;
@@ -42,7 +39,6 @@ bot.start(async (ctx) => {
     firstName: telegrafUser.first_name || "",
     lastName: telegrafUser.last_name || "",
   };
-
 
   await saveUser(userData);
 
@@ -102,42 +98,96 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
 });
 
 bot.action(/confirm_payment:(.+):(.+)/, async (ctx) => {
+  const [chatId, orderId] = ctx.match.slice(1);
+
   await ctx.reply(`សូមបងជួយសេន Transaction ដែលបងបានបង់`);
+  
+
+  // Set up listener for photo upload
+  bot.on("photo", async (ctx) => {
+    const photoId = ctx.message.photo[0].file_id;
+
+    await ctx.reply(
+      "Transaction receipt uploaded successfully. We will notify the seller to verify your transaction."
+    );
+
+    // Send the transaction photo to the seller for verification
+    if (!TELEGRAM_CHAT_ID) {
+      throw new Error("error");
+    }
+
+    await ctx.telegram.sendPhoto(TELEGRAM_CHAT_ID, photoId, {
+      caption: `Order ID: ${orderId}\nA customer has uploaded a transaction receipt for verification.`,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "✅ Verify Transaction",
+              callback_data: `verify_transaction:${chatId}:${orderId}`,
+            },
+            {
+              text: "❌ Reject Transaction",
+              callback_data: `reject_transaction:${chatId}:${orderId}`,
+            },
+          ],
+        ],
+      },
+    });
+  });
 });
 
-bot.on("photo", async (ctx) => {
-  if (!TELEGRAM_CHAT_ID) {
-    throw new Error("error");
-  }
+bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
+  const [chatId, orderId] = ctx.match.slice(1);
 
-  // await handlePhotoUpload(ctx, TELEGRAM_CHAT_ID);
-
-  const photo = ctx.message.photo.pop();
-
-  if (!photo) {
-    throw new Error("Faild to get the file ID");
-  }
-  const telegrafUser = ctx.from;
-
-  const userData = {
-    chatId: ctx.chat.id,
-    username: telegrafUser.username || "Unknow",
-    firstName: telegrafUser.first_name || "",
-    lastName: telegrafUser.last_name || "",
-  };
-
-  await ctx.telegram.sendPhoto(TELEGRAM_CHAT_ID, photo?.file_id, {
-    caption: `
-    New payment receipt received from
-    👤 UserDetail
-    username: ${userData.username}
-    firstname: ${userData.firstName}
-    lastname: ${userData.lastName}
-    `,
+  // Update button to verify
+  await ctx.editMessageReplyMarkup({
+    inline_keyboard: [
+      [{ text: "✅ Verified", callback_data: "verify_transaction" }],
+    ],
   });
 
-  await ctx.sendMessage(`payment receipt has been received`);
+  // Find the order in the database
+
+  // Notify the customer that the payment has been verified
+  await ctx.telegram.sendMessage(
+    chatId,
+    "Your payment has been verified by the seller. Thank you!"
+  );
 });
+
+// bot.on("photo", async (ctx) => {
+//   if (!TELEGRAM_CHAT_ID) {
+//     throw new Error("error");
+//   }
+
+//   // await handlePhotoUpload(ctx, TELEGRAM_CHAT_ID);
+
+//   const photo = ctx.message.photo.pop();
+
+//   if (!photo) {
+//     throw new Error("Faild to get the file ID");
+//   }
+//   const telegrafUser = ctx.from;
+
+//   const userData = {
+//     chatId: ctx.chat.id,
+//     username: telegrafUser.username || "Unknow",
+//     firstName: telegrafUser.first_name || "",
+//     lastName: telegrafUser.last_name || "",
+//   };
+
+//   await ctx.telegram.sendPhoto(TELEGRAM_CHAT_ID, photo?.file_id, {
+//     caption: `
+//     New payment receipt received from
+//     👤 UserDetail
+//     username: ${userData.username}
+//     firstname: ${userData.firstName}
+//     lastname: ${userData.lastName}
+//     `,
+//   });
+
+//   await ctx.sendMessage(`payment receipt has been received`);
+// });
 
 //Ask user to share Location
 bot.command("location", (ctx) => {
