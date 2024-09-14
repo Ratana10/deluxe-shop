@@ -46,7 +46,7 @@ const CartSheet = () => {
     }
 
     toast.promise(
-      fetch("/api/telegram", {
+      fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +61,7 @@ const CartSheet = () => {
       }),
       {
         loading: "Loading ...",
-        success: "Order Placed successfully",
+        success: "Order Placed successfully\nPlease check your telegram notification",
         error: "Order failed! Please try again.",
       }
     );
