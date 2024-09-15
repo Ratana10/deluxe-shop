@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lora } from "next/font/google";
+import {Playfair_Display} from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -8,6 +9,12 @@ import { Toaster } from "react-hot-toast";
 
 const lora = Lora({
   subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  weight: ["400", "700"], 
+  style: 'normal',   
+  subsets: ['latin'], 
 });
 
 export const metadata: Metadata = {

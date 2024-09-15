@@ -26,6 +26,13 @@ console.log("BOT Starting...");
 
 const bot = new Telegraf(BOT_TOKEN);
 
+
+bot.telegram.setMyCommands([
+  { command: "/start", description: "Start placing an order" },
+  { command: "/help", description: "Display the list of available command" },
+  { command: "/contactsupport", description: "Contact support for help" },
+]);
+
 bot.start(async (ctx) => {
   // Simulate typing to make it feel more interactive
   await ctx.sendChatAction("typing");
@@ -52,6 +59,7 @@ bot.start(async (ctx) => {
     Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
   );
 });
+
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
   await handleConfirmOrder(ctx);
@@ -204,7 +212,7 @@ bot.command("location", (ctx) => {
   );
 });
 
-//Command to ask for the user's phone number
+// Command to ask for the user's phone number
 bot.command("phone", (ctx) => {
   ctx.reply(
     "Please share your phone number",
@@ -214,12 +222,31 @@ bot.command("phone", (ctx) => {
   );
 });
 
-//Hanlde phone number when user share contact
+// Hanlde phone number when user share contact
 bot.on("contact", (ctx) => {
   const phoneNumber = ctx.message.contact.phone_number;
   console.log("Phone number:", phoneNumber);
   ctx.reply(`Thank you! We received your phone number: ${phoneNumber}`);
 });
+
+// Command ask for support
+bot.command("support", async (ctx) => {
+  await ctx.reply("How would you like to contact support?", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "📧 Send Message to Support",
+            callback_data: "send_support_message",
+          },
+        ],
+        [{ text: "📞 Call Support", callback_data: "call_support" }],
+      ],
+    },
+  });
+});
+
+// Handle Button action
 
 // Set the webhook only in production and avoid during build
 if (process.env.NODE_ENV === "production") {

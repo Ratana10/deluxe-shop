@@ -38,19 +38,18 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-6 bg-white">
               <SheetHeader>
-                <SheetTitle className="text-2xl text-center font-bold text-[#660404]">
+                <SheetTitle className="text-center text-2xl font-bold text-[#660404]">
                   {setting.logoName}
                 </SheetTitle>
-                <SheetDescription className="mb-4 text-gray-500">
-                </SheetDescription>
+                <SheetDescription className="mb-4 text-gray-500"></SheetDescription>
               </SheetHeader>
-              <nav className="mt-4">
+              <nav className="mt-12">
                 <ul className="space-y-6">
                   {navbars.map((nav) => (
                     <li key={nav.id}>
                       <Link
                         href={nav.href}
-                        className="text-gray-700 text-lg"
+                        className="text-lg font-medium leading-6"
                         onClick={() => setOpen(false)}
                       >
                         {nav.title}
@@ -67,7 +66,7 @@ export default function Header() {
         <div className="flex items-center">
           <Link
             href="/"
-            className="text-2xl lg:text-3xl font-bold text-[#660404]"
+            className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#660404]"
           >
             {setting.logoName}
           </Link>

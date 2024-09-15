@@ -41,25 +41,25 @@ export function ProductCard({ product }: Props) {
       <div className="mt-4">
         {/* Product Name */}
         <Link href={`/products/${product.id}`}>
-          <motion.h2
+          <motion.h4
             whileHover={{ color: "#AB8529", scale: 1.05 }}
             transition={{ duration: 0.3 }}
-            className="text-lg font-semibold text-[#660404]"
+            className="text-lg md:text-xl  font-semibold text-[#660404]"
           >
             {product.name}
-          </motion.h2>
+          </motion.h4>
         </Link>
 
         {/* Price and View Detail Button */}
         <div className="flex justify-between items-end mt-2">
           {/* Product Price */}
-          <span className="text-lg font-bold text-gray-900">
+          <span className="text-base font-bold text-gray-900">
             ${product.price.toFixed(2)}
           </span>
 
           {/* Stock Status */}
           <span
-            className={`ml-auto px-2 rounded-sm ${
+            className={`ml-auto px-2 py-1 rounded-sm text-sm ${
               product.status === "Available"
                 ? "bg-[#AB8529] text-white"
                 : "bg-[#660404] text-white"
