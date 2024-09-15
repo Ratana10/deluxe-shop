@@ -7,10 +7,7 @@ interface Props {
   params: { id: string };
 }
 
-export async function generateMetadata(
-  { params }: Props,
-): Promise<Metadata> {
-  
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getProductById(params.id);
 
   if (!product) {
@@ -21,20 +18,23 @@ export async function generateMetadata(
     title: product?.name,
     description: product?.description,
     openGraph: {
-      images: [{
-        url: product?.images[0]
-      }],
+      images: [
+        {
+          url: product?.images[0],
+        },
+      ],
     },
-  }
+  };
 }
-
 
 export async function generateStaticParams() {
   const products = await getProducts();
- 
-  return products.map(({id}) => id).slice(0, 5);
-}
 
+  return products.map(({id}) => id).slice(0, 5)
+  // return products.map((product) => ({
+  //   id: product.id,
+  // }));
+}
 
 const ProductIdPage = async ({ params }: Props) => {
   const product = await getProductById(params.id);
