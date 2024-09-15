@@ -18,7 +18,10 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Deluxe",
+  title: {
+    default: "Deluxe",
+    template: "%s - Deluxe"
+  },
   description: "Deluxe shop",
 };
 
