@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export async function generateStaticParams() {
   const products = await getProducts();
 
-  return products.map((product) => ({
+  return products.slice(0, 10).map((product) => ({
     id: product.id,
   }));
 }

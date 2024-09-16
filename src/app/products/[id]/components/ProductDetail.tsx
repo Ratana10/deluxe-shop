@@ -151,7 +151,7 @@ const ProductDetail = ({ product }: Props) => {
         </motion.div>
 
         {/* Product Details Section */}
-        <motion.div variants={itemVariants} className="grid gap-6">
+        <motion.div variants={itemVariants} className="flex-1 flex flex-col justify-center gap-6">
           <div className="flex flex-col">
             {/* Product Name */}
             <h1 className="font-bold text-3xl sm:text-4xl text-[#660404]">
