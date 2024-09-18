@@ -1,4 +1,4 @@
-import { Markup, Telegraf } from "telegraf";
+import { Context, Markup, session, Telegraf } from "telegraf";
 import {
   handleConfirmOrder,
   handlePhotoUpload,
@@ -11,6 +11,24 @@ import { OrderStatus, PaymentStatus } from "@/types/enums";
 import { updatePaymentStatus } from "@/service/bot/order.service";
 import dedent from "dedent";
 import { getOrderById, updateOrderStatus } from "@/service/order.service";
+import {
+  getOrderByChatId,
+  updateOrderLocation,
+  updateOrderPhoneNumber,
+} from "@/service/db/order.service";
+import { updateUserPhoneNumber } from "@/service/db/user.service";
+
+// Bot type
+
+export interface SessionData {
+  orderId?: string;
+  messageCount: number;
+}
+
+export interface CustomContext extends Context {
+  session: SessionData;
+  match?: RegExpExecArray;
+}
 
 // Load environment variables from .env
 dotenv.config();
@@ -26,7 +44,10 @@ if (!BOT_TOKEN) {
 
 console.log("BOT Starting...");
 
-const bot = new Telegraf(BOT_TOKEN);
+const bot = new Telegraf<CustomContext>(BOT_TOKEN);
+
+// Apply session middleware
+bot.use(session());
 
 bot.telegram.setMyCommands([
   { command: "/start", description: "Start placing an order" },
@@ -48,13 +69,14 @@ bot.start(async (ctx) => {
     username: telegrafUser.username || "Unknow",
     firstName: telegrafUser.first_name || "",
     lastName: telegrafUser.last_name || "",
+    phoneNumber: "",
   };
 
   await saveUser(userData);
 
   //Personalized Welcome message
   await ctx.reply(
-    `សួស្ដី  ${
+    `Hello ${
       telegrafUser.first_name || "there"
     }! ⭐\nReady to place an order!!`,
     Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
@@ -85,11 +107,6 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
     inline_keyboard: [[{ text: "🟢 Confirm", callback_data: "no_action" }]],
   });
 
-  // await bot.telegram.sendMessage(
-  //   chatId,
-  //   "Your order has been Confirmed by the seller! ✅"
-  // );
-
   //Update Order Status
   await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
 
@@ -101,25 +118,24 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
       .oneTime()
       .resize()
   );
-
-  // await bot.telegram.sendMessage(
-  //   chatId!, // Customer's Telegram chat ID
-  //   `How would you like to pay?`,
-  //   Markup.inlineKeyboard([
-  //     [
-  //       {
-  //         text: "🚚 Pay via delivery",
-  //         callback_data: `pay_delivery:${chatId}:${orderId}`,
-  //       },
-  //       {
-  //         text: "🏦 Pay via bank",
-  //         callback_data: `pay_bank:${chatId}:${orderId}`,
-  //       },
-  //     ],
-  //   ])
-  // );
 });
 
+// await bot.telegram.sendMessage(
+//   chatId!, // Customer's Telegram chat ID
+//   `How would you like to pay?`,
+//   Markup.inlineKeyboard([
+//     [
+//       {
+//         text: "🚚 Pay via delivery",
+//         callback_data: `pay_delivery:${chatId}:${orderId}`,
+//       },
+//       {
+//         text: "🏦 Pay via bank",
+//         callback_data: `pay_bank:${chatId}:${orderId}`,
+//       },
+//     ],
+//   ])
+// );
 bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   await handleRejectOrder(ctx);
 });
@@ -243,63 +259,51 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
   );
 });
 
-// Command to ask for the user's phone number
-bot.command("phone", (ctx) => {
-  ctx.reply(
-    "Please share your phone number",
-    Markup.keyboard([Markup.button.contactRequest("📱 Share Phone Number")])
-      .oneTime()
-      .resize()
-  );
-});
-
 // Hanlde phone number when user share contact
 bot.on("contact", async (ctx) => {
   const chatId = ctx.chat.id;
 
-
   const phoneNumber = ctx.message.contact.phone_number;
-  console.log("Phone number:", phoneNumber);
+
+  // Save customer phone number into db order
+  const updatedUserr = await updateUserPhoneNumber(chatId, phoneNumber);
+
   ctx.reply(`Thank you! We received your phone number: ${phoneNumber}`);
 
   // Step 2: Ask for the location
+  // Ask for the location next
+  await ctx.reply("Please type in your delivery location.");
 });
 
+bot.on("text", async (ctx) => {
+  const chatId = ctx.chat.id;
+  const location = ctx.message.text;
 
+  await ctx.reply(`Your delivery location has been set to: ${location}`);
+  
+  // Save location into order table
+  const order = await getOrderByChatId(chatId);
 
-// bot.on("photo", async (ctx) => {
-//   if (!TELEGRAM_CHAT_ID) {
-//     throw new Error("error");
-//   }
+  await updateOrderLocation(order._id, location);
 
-//   // await handlePhotoUpload(ctx, TELEGRAM_CHAT_ID);
-
-//   const photo = ctx.message.photo.pop();
-
-//   if (!photo) {
-//     throw new Error("Faild to get the file ID");
-//   }
-//   const telegrafUser = ctx.from;
-
-//   const userData = {
-//     chatId: ctx.chat.id,
-//     username: telegrafUser.username || "Unknow",
-//     firstName: telegrafUser.first_name || "",
-//     lastName: telegrafUser.last_name || "",
-//   };
-
-//   await ctx.telegram.sendPhoto(TELEGRAM_CHAT_ID, photo?.file_id, {
-//     caption: `
-//     New payment receipt received from
-//     👤 UserDetail
-//     username: ${userData.username}
-//     firstname: ${userData.firstName}
-//     lastname: ${userData.lastName}
-//     `,
-//   });
-
-//   await ctx.sendMessage(`payment receipt has been received`);
-// });
+  console.log("ORder", order);
+  await bot.telegram.sendMessage(
+    chatId!, // Customer's Telegram chat ID
+    `How would you like to pay?`,
+    Markup.inlineKeyboard([
+      [
+        {
+          text: "🚚 Pay via delivery",
+          callback_data: `pay_delivery:${chatId}:${order._id}`,
+        },
+        {
+          text: "🏦 Pay via bank",
+          callback_data: `pay_bank:${chatId}:${order._id}`,
+        },
+      ],
+    ])
+  );
+});
 
 //Ask user to share Location
 bot.command("location", (ctx) => {

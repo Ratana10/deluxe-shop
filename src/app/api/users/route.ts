@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { chatId, username, firstName, lastName } = await req.json();
+    const { chatId, username, firstName, lastName, phoneNumber } = await req.json();
 
     await connectMongoDB();
 
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
       firstName,
       lastName,
       botUsed: 1,
+      phoneNumber
     });
 
     console.log("saved new user:", newUser);

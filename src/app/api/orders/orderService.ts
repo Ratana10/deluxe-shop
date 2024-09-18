@@ -21,6 +21,7 @@ export async function createOrder(
       orderStatus: OrderStatus.PENDING,
       total: totalPrice,
       paymentStaus: PaymentStatus.PENDING,
+      location: "",
     });
 
     const savedOrder = await order.save();

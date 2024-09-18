@@ -1,3 +1,5 @@
+import { Context } from "telegraf";
+
 export interface Customer {
   chatId: number;
   username: string;
@@ -54,4 +56,15 @@ export interface CartContextType {
   decreaseQuantity: (id: string) => void;
   clearCart: () => void;
   totalQuantity: number;
+}
+
+// Bot type
+
+export interface SessionData {
+  orderId?: string;
+}
+
+export interface CustomContext extends Context {
+  session: SessionData;
+  match?: RegExpExecArray;
 }

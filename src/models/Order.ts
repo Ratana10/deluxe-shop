@@ -8,6 +8,8 @@ interface OrderDocument extends Document {
   total: number;
   orderDetails: mongoose.Types.ObjectId[];
   paymentStatus: PaymentStatus;
+  phoneNumber: string;
+  location: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +29,8 @@ const OrderSchema: Schema = new Schema(
       default: PaymentStatus.PENDING,
     },
     total: { type: Number, required: false },
+    phoneNumber: { type: String, required: false },
+    location: { type: String, required: false },
     orderDetails: [{ type: mongoose.Types.ObjectId, ref: "OrderDetail" }],
   },
   {
