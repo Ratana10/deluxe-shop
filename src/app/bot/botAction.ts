@@ -33,25 +33,27 @@ export async function handleConfirmOrder(ctx: any) {
   //   "Your order has been Confirmed by the seller! ✅"
   // );
 
+  //Update Order Status
+  await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+  
   await bot.telegram.sendMessage(
     chatId!, // Customer's Telegram chat ID
-    `បងចង់ pay ប្រាក់តាមរបៀបណា`,
+    `How would you like to pay?`,
     Markup.inlineKeyboard([
       [
         {
-          text: "🚚 Pay via Delivery",
+          text: "🚚 Pay via delivery",
           callback_data: `pay_delivery:${chatId}:${orderId}`,
         },
         {
-          text: "🏦 Pay via Bank",
+          text: "🏦 Pay via bank",
           callback_data: `pay_bank:${chatId}:${orderId}`,
         },
       ],
     ])
   );
 
-  //Update Order Status
-  await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+  
 }
 
 export async function handleRejectOrder(ctx: any) {

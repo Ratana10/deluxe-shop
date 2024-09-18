@@ -9,6 +9,7 @@ import { saveUser } from "@/service/user.service";
 import path from "path";
 import { PaymentStatus } from "@/types/enums";
 import { updatePaymentStatus } from "@/service/bot/order.service";
+import dedent from "dedent";
 
 // Load environment variables from .env
 dotenv.config();
@@ -71,7 +72,19 @@ bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
 
 bot.action(/pay_delivery:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
-  await ctx.reply(`Thanks you selected delivery`);
+  await ctx.reply(
+    dedent(
+      `
+      Thank you for placing the orders.
+      We would love to inform you that 
+      it might take around a half day to 2 days 
+      for you to get the items.
+
+      If you have any problem, 
+      Please kindly direct massage to the shop's owner
+      `
+    )
+  );
 });
 
 bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
@@ -84,40 +97,42 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
 
   await ctx.telegram.sendPhoto(
     chatId,
-
     imageUrl,
-
     {
-      caption: `នេះជា QR code របស់យើង`,
+      caption: dedent(`
+        📷 Here is our ABA QR.
+        
+        📝 Please transfer the amount and send the transaction receipt 
+        in this chat once the payment is completed.
+        
+        🛑 If you encounter any issues, feel free to contact us.
+      `),
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text: "❌ មិនទាន់បានបង់",
-              callback_data: `cancel_payment:${chatId}:${orderId}`,
-            },
-            {
-              text: "✅ បង់រួចហើយ",
-              callback_data: `confirm_payment:${chatId}:${orderId}`,
-            },
-          ],
-        ],
-      },
-    }
+              text: "✅ Already pay",
+              callback_data: `confirm_payment:${chatId}:${orderId}`
+            }
+          ]
+        ]
+      }
+    },
   );
 });
 
+// Stop using
 bot.action(/confirm_payment:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
 
-  await ctx.reply(`សូមបងជួយសេន Transaction ដែលបងបានបង់`);
+  await ctx.reply(`Please send transaction receipt.`);
 
   // Set up listener for photo upload
   bot.on("photo", async (ctx) => {
     const photoId = ctx.message.photo[0].file_id;
 
     await ctx.reply(
-      "Transaction receipt uploaded successfully. We will notify the seller to verify your transaction."
+      "Transaction receipt uploaded successfully. We will notify the shop's ower to verify your transaction."
     );
 
     // Send the transaction photo to the seller for verification
@@ -164,7 +179,17 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
   // Notify the customer that the payment has been verified
   await ctx.telegram.sendMessage(
     chatId,
-    "Your payment has been verified by the seller. Thank you!"
+    dedent(
+      `
+      Thank you for placing the orders.
+      We would love to inform you that 
+      it might take around a half day to 2 days 
+      for you to get the items.
+
+      If you have any problem, 
+      Please kindly direct massage to the shop's owner
+      `
+    )
   );
 });
 

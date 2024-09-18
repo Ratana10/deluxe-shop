@@ -65,8 +65,8 @@ export async function POST(req: NextRequest) {
       📦 Order ID: ${orderId}
       📅 Date: ${currentDate}
 
-      📞 Contact Seller: 0964347813
-      Please wait ...
+      📞 Shop's owner:  061664996
+      Your order is pending confirmation. Please wait...
         `
     );
 
