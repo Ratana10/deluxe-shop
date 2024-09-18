@@ -7,9 +7,10 @@ import {
 import dotenv from "dotenv";
 import { saveUser } from "@/service/user.service";
 import path from "path";
-import { PaymentStatus } from "@/types/enums";
+import { OrderStatus, PaymentStatus } from "@/types/enums";
 import { updatePaymentStatus } from "@/service/bot/order.service";
 import dedent from "dedent";
+import { getOrderById, updateOrderStatus } from "@/service/order.service";
 
 // Load environment variables from .env
 dotenv.config();
@@ -26,7 +27,6 @@ if (!BOT_TOKEN) {
 console.log("BOT Starting...");
 
 const bot = new Telegraf(BOT_TOKEN);
-
 
 bot.telegram.setMyCommands([
   { command: "/start", description: "Start placing an order" },
@@ -61,9 +61,63 @@ bot.start(async (ctx) => {
   );
 });
 
-
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
-  await handleConfirmOrder(ctx);
+  // await handleConfirmOrder(ctx);
+  const [chatId, orderId] = ctx.match.slice(1);
+
+  await ctx.answerCbQuery();
+
+  await ctx.editMessageReplyMarkup({
+    inline_keyboard: [
+      [{ text: "✅ Confirmed", callback_data: "confirm_order" }],
+    ],
+  });
+
+  const { cusMsgId } = await getOrderById(orderId);
+
+  if (!cusMsgId) {
+    console.error("cusMsgId", cusMsgId, orderId);
+    throw new Error("cusMsgId id not found");
+  }
+
+  //update customer chat Pending to Confirm
+  await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
+    inline_keyboard: [[{ text: "🟢 Confirm", callback_data: "no_action" }]],
+  });
+
+  // await bot.telegram.sendMessage(
+  //   chatId,
+  //   "Your order has been Confirmed by the seller! ✅"
+  // );
+
+  //Update Order Status
+  await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+
+  // Step1: Ask for phone number
+  await bot.telegram.sendMessage(
+    chatId,
+    `Please share your phone number for the order.`,
+    Markup.keyboard([Markup.button.contactRequest("📞 Share Phone Number")])
+      .oneTime()
+      .resize()
+  );
+
+  // await bot.telegram.sendMessage(
+  //   chatId!, // Customer's Telegram chat ID
+  //   `How would you like to pay?`,
+  //   Markup.inlineKeyboard([
+  //     [
+  //       {
+  //         text: "🚚 Pay via delivery",
+  //         callback_data: `pay_delivery:${chatId}:${orderId}`,
+  //       },
+  //       {
+  //         text: "🏦 Pay via bank",
+  //         callback_data: `pay_bank:${chatId}:${orderId}`,
+  //       },
+  //     ],
+  //   ])
+  // );
 });
 
 bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
@@ -95,11 +149,8 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
   await ctx.sendChatAction("upload_photo");
   await new Promise((resolve) => setTimeout(resolve, 1000)); //Wait 1 second
 
-  await ctx.telegram.sendPhoto(
-    chatId,
-    imageUrl,
-    {
-      caption: dedent(`
+  await ctx.telegram.sendPhoto(chatId, imageUrl, {
+    caption: dedent(`
         📷 Here is our ABA QR.
         
         📝 Please transfer the amount and send the transaction receipt 
@@ -107,18 +158,17 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
         
         🛑 If you encounter any issues, feel free to contact us.
       `),
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "✅ Already pay",
-              callback_data: `confirm_payment:${chatId}:${orderId}`
-            }
-          ]
-        ]
-      }
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "✅ Already pay",
+            callback_data: `confirm_payment:${chatId}:${orderId}`,
+          },
+        ],
+      ],
     },
-  );
+  });
 });
 
 // Stop using
@@ -193,6 +243,30 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
   );
 });
 
+// Command to ask for the user's phone number
+bot.command("phone", (ctx) => {
+  ctx.reply(
+    "Please share your phone number",
+    Markup.keyboard([Markup.button.contactRequest("📱 Share Phone Number")])
+      .oneTime()
+      .resize()
+  );
+});
+
+// Hanlde phone number when user share contact
+bot.on("contact", async (ctx) => {
+  const chatId = ctx.chat.id;
+
+
+  const phoneNumber = ctx.message.contact.phone_number;
+  console.log("Phone number:", phoneNumber);
+  ctx.reply(`Thank you! We received your phone number: ${phoneNumber}`);
+
+  // Step 2: Ask for the location
+});
+
+
+
 // bot.on("photo", async (ctx) => {
 //   if (!TELEGRAM_CHAT_ID) {
 //     throw new Error("error");
@@ -235,23 +309,6 @@ bot.command("location", (ctx) => {
       .oneTime()
       .resize()
   );
-});
-
-// Command to ask for the user's phone number
-bot.command("phone", (ctx) => {
-  ctx.reply(
-    "Please share your phone number",
-    Markup.keyboard([Markup.button.contactRequest("📱 Share Phone Number")])
-      .oneTime()
-      .resize()
-  );
-});
-
-// Hanlde phone number when user share contact
-bot.on("contact", (ctx) => {
-  const phoneNumber = ctx.message.contact.phone_number;
-  console.log("Phone number:", phoneNumber);
-  ctx.reply(`Thank you! We received your phone number: ${phoneNumber}`);
 });
 
 // Command ask for support
