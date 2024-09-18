@@ -1,4 +1,5 @@
 import { connectMongoDB } from "@/lib/mongodb";
+import Counter from "@/models/Counter";
 import Order from "@/models/Order";
 import OrderDetail from "@/models/OrderDetail";
 import { CartItem } from "@/types";
@@ -7,7 +8,7 @@ import { OrderStatus, PaymentStatus } from "@/types/enums";
 export async function createOrder(
   chatId: string,
   cart: CartItem[]
-): Promise<string> {
+){
   try {
     await connectMongoDB();
 
@@ -16,13 +17,28 @@ export async function createOrder(
       0
     );
 
+     // Step 1: Generate the orderNumber (assuming you already implemented this logic)
+     const counter = await Counter.findOneAndUpdate(
+      { name: "orderNumber" },        // Find the counter document by name
+      { $inc: { seq: 1 } },           // Increment the sequence number
+      { new: true, upsert: true }     // Create a new counter if it doesn't exist
+    );
+
+    const seq = counter.seq;
+    const yearMonth = new Date().toISOString().slice(0, 7).replace("-", ""); // e.g., 202409 for Sept 2024
+    const orderNumber = `DELUXE${yearMonth}${String(seq).padStart(4, "0")}`;  // e.g., DELUXE202409000
+
+    console.log("Order number", orderNumber)
     const order = new Order({
       chatId,
       orderStatus: OrderStatus.PENDING,
       total: totalPrice,
       paymentStaus: PaymentStatus.PENDING,
       location: "",
+      orderNumber: orderNumber
     });
+
+    console.log("Order", order)
 
     const savedOrder = await order.save();
 
@@ -43,10 +59,15 @@ export async function createOrder(
 
     await savedOrder.save();
 
-    return savedOrder._id.toString();
+    return {
+      orderId: savedOrder._id.toString(),
+      orderNumber: orderNumber
+    }
+    // return savedOrder._id.toString();
+
   } catch (error) {
     console.log("ERROR while creating order");
-    return "";
+    return null;
   }
 }
 

@@ -15,7 +15,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Save cart into db
-    const orderId = await createOrder(chatId, cart);
+    const result = await createOrder(chatId, cart);
+    if (result == null) {
+      return;
+    }
+
+    const { orderId, orderNumber } = result;
+
+    console.log("Order id", orderId, orderNumber);
 
     const formattedCartItems = cart
       .map(
@@ -46,13 +53,13 @@ export async function POST(req: NextRequest) {
       ✨ You have a new order:
       ${formattedCartItems}
       💵 Total: $${totalPrice}
-      📦 Order ID: ${orderId}
-      📅 Date: ${currentDate}
+      📦 Order: ${orderNumber}
+      📅 Date : ${currentDate}
 
       👤 UserDetail
-      username: ${user.username}
+      username : ${user.username}
       firstname: ${user.firstName}
-      lastname: ${user.lastName}
+      lastname : ${user.lastName}
       `
     );
 
@@ -62,8 +69,8 @@ export async function POST(req: NextRequest) {
       ✨ You have placed an order:
       ${formattedCartItems}
       💵 Total: $${totalPrice}
-      📦 Order ID: ${orderId}
-      📅 Date: ${currentDate}
+      📦 Order: ${orderNumber}
+      📅 Date : ${currentDate}
 
       📞 Shop's owner:  061664996
       Your order is pending confirmation. Please wait...
