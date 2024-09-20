@@ -3,7 +3,7 @@ import Counter from "@/models/Counter";
 import Order from "@/models/Order";
 import OrderDetail from "@/models/OrderDetail";
 import { CartItem } from "@/types";
-import { OrderStatus, OrderStep, PaymentStatus } from "@/types/enums";
+import { OrderStatus,  PaymentStatus } from "@/types/enums";
 
 export async function createOrder(
   chatId: string,
@@ -31,11 +31,10 @@ export async function createOrder(
     console.log("Order number", orderNumber)
     const order = new Order({
       chatId,
-      orderStatus: OrderStatus.PENDING,
+      orderStatus: OrderStatus.AWAITING_CONFIRM,
       total: totalPrice,
       paymentStaus: PaymentStatus.PENDING,
       location: "",
-      currentStep: OrderStep.AWATING_CONFIRM,
       orderNumber: orderNumber
     });
 

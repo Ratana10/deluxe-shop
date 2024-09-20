@@ -1,18 +1,17 @@
 import { Context, Markup, session, Telegraf } from "telegraf";
-import { handleRejectOrder } from "./botAction";
 import dotenv from "dotenv";
 import { saveUser } from "@/service/user.service";
-import { OrderStatus, OrderStep, PaymentStatus } from "@/types/enums";
-import { updatePaymentStatus } from "@/service/bot/order.service";
+import { OrderStatus, PaymentStatus } from "@/types/enums";
 import dedent from "dedent";
-import { getOrderById, updateOrderStatus } from "@/service/order.service";
 import {
+  getOrderById,
   updateOrderLocation,
+  updateOrderPaymentStatus,
   updateOrderPhoneNumber,
+  updateOrderStatus,
 } from "@/service/db/order.service";
 
 // Bot type
-
 export interface SessionData {
   orderId?: string;
   messageCount: number;
@@ -31,7 +30,7 @@ const WEB_LINK = process.env.NEXT_PUBLIC_API_BASE_URL;
 const WEBHOOK_URL = `${WEB_LINK}/api/webhook`;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-if (!BOT_TOKEN) {
+if (!BOT_TOKEN || !TELEGRAM_CHAT_ID) {
   throw new Error("TELEGRAM_BOT_TOKEN is required");
 }
 
@@ -101,18 +100,15 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
   });
 
   //Update Order Status
-  let order = await updateOrderStatus(
-    orderId,
-    OrderStatus.CONFIRMED,
-    OrderStep.AWAITING_PHONE
-  );
+  let order = await updateOrderStatus(orderId, OrderStatus.AWAITING_PHONE);
 
-  // Ask the user to type their phone number instead of sharing it
+  // Ask the user to type their phone number
   await bot.telegram.sendMessage(
     chatId,
     `Please type your phone number example: 096888888`
   );
 
+  // Setup listener
   bot.on("text", async (ctx) => {
     const chatId = String(ctx.message.chat.id);
     const userInput = ctx.message?.text;
@@ -123,25 +119,33 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
 
     // Get order
     order = await getOrderById(orderId);
-    console.log("ORder test", order);
+    console.log("Order", order);
 
-    if (order.currentStep === OrderStep.AWAITING_PHONE) {
+    if (order.orderStatus === OrderStatus.AWAITING_PHONE) {
       if (validatePhoneNumber(userInput)) {
         await ctx.reply(`Thank you! Your phone number has been recorded.`);
         await updateOrderPhoneNumber(
           orderId,
           userInput,
-          OrderStep.AWAITING_LOCATION
+          OrderStatus.AWAITING_LOCATION
         );
         await ctx.reply(`Please type in your location for delivery.`);
       } else {
+        // Wrong phone number format
         await ctx.reply(
           `The phone number you entered is invalid. Please try again.`
         );
       }
-    } else if (order.currentStep === OrderStep.AWAITING_LOCATION) {
-      await updateOrderLocation(orderId, userInput, OrderStep.COMPLETED);
-      await ctx.reply(`Thank you! Your location has been set to ${userInput}.`);
+    } else if (order.orderStatus === OrderStatus.AWAITING_LOCATION) {
+      await ctx.reply(
+        `Thank you! Your delivery location has been set to ${userInput}.`
+      );
+
+      await updateOrderLocation(
+        orderId,
+        userInput,
+        OrderStatus.AWAITING_DELIVERY
+      );
 
       await bot.telegram.sendMessage(
         chatId!, // Customer's Telegram chat ID
@@ -170,11 +174,45 @@ function validatePhoneNumber(phoneNumber: string) {
 }
 
 bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
-  await handleRejectOrder(ctx);
+  const [chatId, orderId] = ctx.match.slice(1);
+
+  await ctx.answerCbQuery();
+
+  await ctx.editMessageReplyMarkup({
+    inline_keyboard: [[{ text: "❌ Rejected", callback_data: "reject_order" }]],
+  });
+
+  // notify ower write the rejected reason
+  await ctx.reply("Please provide a reason for rejecting the order");
+
+  // bot.on("")
+
+  const { cusMsgId } = await getOrderById(orderId);
+
+  if (!cusMsgId) {
+    console.error("cusMsgId", cusMsgId, orderId);
+    throw new Error("cusMsgId id not found");
+  }
+
+  //update customer chat Pending to Rejected
+  await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
+    inline_keyboard: [[{ text: "🔴 Rejected", callback_data: "no_action" }]],
+  });
+
+  await bot.telegram.sendMessage(
+    chatId,
+    "Your order has been rejected by the shop's owner! ❌"
+  );
+
+  //Update Order Status
+  await updateOrderStatus(orderId, OrderStatus.REJECTED);
 });
 
 bot.action(/pay_delivery:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
+
+  await updateOrderStatus(orderId, OrderStatus.AWAITING_DELIVERY);
+
   await ctx.reply(
     dedent(
       `
@@ -192,7 +230,12 @@ bot.action(/pay_delivery:(.+):(.+)/, async (ctx) => {
 
 bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
-  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/img/aba_qr.jpg?v=${new Date().getTime()}`;
+
+  // const imageUrl = `${
+  //   process.env.NEXT_PUBLIC_API_BASE_URL
+  // }/img/aba_qr.jpg?v=${new Date().getTime()}`;
+
+  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/img/aba_qr.jpg`;
 
   const order = await getOrderById(orderId);
 
@@ -212,7 +255,7 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
       inline_keyboard: [
         [
           {
-            text: "✅ Already pay",
+            text: "✅ Already paid",
             callback_data: `confirm_payment:${chatId}:${orderId}`,
           },
         ],
@@ -235,23 +278,33 @@ bot.action(/confirm_payment:(.+):(.+)/, async (ctx) => {
       "Transaction receipt uploaded successfully. We will notify the shop's ower to verify your transaction."
     );
 
-    // Send the transaction photo to the seller for verification
-    if (!TELEGRAM_CHAT_ID) {
-      throw new Error("error");
-    }
+    // Update payment status
+    await updateOrderPaymentStatus(orderId, PaymentStatus.AWAITING_VERIIFY);
 
-    await ctx.telegram.sendPhoto(TELEGRAM_CHAT_ID, photoId, {
-      caption: `Order ID: ${orderId}\nA customer has uploaded a transaction receipt for verification.`,
+    // Send the transaction photo to the seller for verification
+    const owerChatId = process.env.TELEGRAM_CHAT_ID;
+
+    const order = await getOrderById(orderId);
+
+    const messsage = dedent(`
+    💵 Total: $${order.total}
+    📦 Order: ${order.orderNumber}
+    A customer has uploaded a transaction receipt for verification
+    `);
+
+    // Forward the transaction to the shop's ower
+    await ctx.telegram.sendPhoto(owerChatId!, photoId, {
+      caption: messsage,
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text: "✅ Verify Transaction",
-              callback_data: `verify_transaction:${chatId}:${orderId}`,
+              text: "❌ Reject",
+              callback_data: `reject_transaction:${chatId}:${orderId}`,
             },
             {
-              text: "❌ Reject Transaction",
-              callback_data: `reject_transaction:${chatId}:${orderId}`,
+              text: "✅ Verify",
+              callback_data: `verify_transaction:${chatId}:${orderId}`,
             },
           ],
         ],
@@ -270,11 +323,8 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
     ],
   });
 
-  console.log("ChatID", chatId);
-  console.log("OrderID", orderId);
-
   // Find the order in the database
-  const order = await updatePaymentStatus(orderId, PaymentStatus.COMPLETED);
+  await updateOrderPaymentStatus(orderId, PaymentStatus.VERIFIED);
 
   // Notify the customer that the payment has been verified
   await ctx.telegram.sendMessage(
@@ -319,6 +369,18 @@ bot.command("contactsupport", async (ctx) => {
       },
     }
   );
+});
+
+// Command broadcast
+bot.command("broadcast", async (ctx) => {
+  const admin = process.env.TELEGRAM_CHAT_ID;
+
+  //Check admin
+  if (String(ctx.from.id) === admin) {
+    ctx.reply("Broadcasted to all customer");
+  } else {
+    ctx.reply("Sorry, you are not authorized to use this command.");
+  }
 });
 
 // Set the webhook only in production and avoid during build

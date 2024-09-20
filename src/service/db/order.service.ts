@@ -1,16 +1,17 @@
 import { connectMongoDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
+import { OrderStatus, PaymentStatus } from "@/types/enums";
 
-export async function updateOrderPhoneNumber(
+// Update ordered phone number
+export async function updateOrderStatus(
   orderId: string,
-  phoneNumber: string,
-  step: string
+  orderStatus: OrderStatus
 ) {
   await connectMongoDB();
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { phoneNumber: phoneNumber, currentStep: step },
+    { orderStatus: orderStatus },
     { new: true }
   );
 
@@ -21,16 +22,19 @@ export async function updateOrderPhoneNumber(
   return updatedOrder;
 }
 
-export async function updateOrderLocation(orderId: string, location: string, step: string) {
+// Update ordered phone number
+export async function updateOrderPhoneNumber(
+  orderId: string,
+  phoneNumber: string,
+  orderStatus: OrderStatus
+) {
   await connectMongoDB();
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { location: location, currentStep: step },
+    { phoneNumber: phoneNumber, orderStatus: orderStatus },
     { new: true }
   );
-
-  console.log("update order location", updatedOrder)
 
   if (!updatedOrder) {
     throw new Error("Order not found");
@@ -39,6 +43,30 @@ export async function updateOrderLocation(orderId: string, location: string, ste
   return updatedOrder;
 }
 
+// Update ordered location
+export async function updateOrderLocation(
+  orderId: string,
+  location: string,
+  orderStatus: OrderStatus
+) {
+  await connectMongoDB();
+
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { location: location, orderStatus: orderStatus },
+    { new: true }
+  );
+
+  console.log("update order location", updatedOrder);
+
+  if (!updatedOrder) {
+    throw new Error("Order not found");
+  }
+
+  return updatedOrder;
+}
+
+// Get ordered by ChatId
 export async function getOrderByChatId(chatId: number) {
   await connectMongoDB();
 
@@ -51,7 +79,28 @@ export async function getOrderByChatId(chatId: number) {
   return order;
 }
 
+// Get ordered by orderId
 export async function getOrderById(orderId: string) {
   await connectMongoDB();
   return await Order.findById(orderId);
+}
+
+// Update ordered Payment
+export async function updateOrderPaymentStatus(
+  orderId: string,
+  paymentStatus: PaymentStatus
+) {
+  await connectMongoDB();
+
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { paymentStatus: paymentStatus },
+    { new: true }
+  );
+
+  if (!updatedOrder) {
+    throw new Error("Order not found");
+  }
+
+  return updatedOrder;
 }

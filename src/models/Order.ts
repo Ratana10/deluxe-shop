@@ -12,7 +12,6 @@ interface OrderDocument extends Document {
   paymentStatus: PaymentStatus;
   phoneNumber: string;
   location: string;
-  currentStep: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,7 +24,7 @@ const OrderSchema: Schema = new Schema(
     orderStatus: {
       type: String,
       enum: Object.values(OrderStatus),
-      default: OrderStatus.PENDING,
+      default: OrderStatus.AWAITING_CONFIRM,
     },
     paymentStatus: {
       type: String,
@@ -35,7 +34,6 @@ const OrderSchema: Schema = new Schema(
     total: { type: Number, required: false },
     phoneNumber: { type: String, required: false },
     location: { type: String, required: false },
-    currentStep: { type: String, required: false },
     orderDetails: [{ type: mongoose.Types.ObjectId, ref: "OrderDetail" }],
   },
   {
