@@ -192,7 +192,7 @@ bot.action(/pay_delivery:(.+):(.+)/, async (ctx) => {
 
 bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
-  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/img/aba_qr.jpg`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/img/aba_qr.jpg?v=${new Date().getTime()}`;
 
   const order = await getOrderById(orderId);
 
