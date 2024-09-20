@@ -12,6 +12,7 @@ interface OrderDocument extends Document {
   paymentStatus: PaymentStatus;
   phoneNumber: string;
   location: string;
+  currentStep: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +35,7 @@ const OrderSchema: Schema = new Schema(
     total: { type: Number, required: false },
     phoneNumber: { type: String, required: false },
     location: { type: String, required: false },
+    currentStep: { type: String, required: false },
     orderDetails: [{ type: mongoose.Types.ObjectId, ref: "OrderDetail" }],
   },
   {

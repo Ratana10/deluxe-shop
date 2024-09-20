@@ -1,22 +1,15 @@
 import { Context, Markup, session, Telegraf } from "telegraf";
-import {
-  handleConfirmOrder,
-  handlePhotoUpload,
-  handleRejectOrder,
-} from "./botAction";
+import { handleRejectOrder } from "./botAction";
 import dotenv from "dotenv";
 import { saveUser } from "@/service/user.service";
-import path from "path";
-import { OrderStatus, PaymentStatus } from "@/types/enums";
+import { OrderStatus, OrderStep, PaymentStatus } from "@/types/enums";
 import { updatePaymentStatus } from "@/service/bot/order.service";
 import dedent from "dedent";
 import { getOrderById, updateOrderStatus } from "@/service/order.service";
 import {
-  getOrderByChatId,
   updateOrderLocation,
   updateOrderPhoneNumber,
 } from "@/service/db/order.service";
-import { updateUserPhoneNumber } from "@/service/db/user.service";
 
 // Bot type
 
@@ -63,6 +56,14 @@ bot.start(async (ctx) => {
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
   const telegrafUser = ctx.from;
 
+  //Personalized Welcome message
+  await ctx.reply(
+    `Hello ${
+      telegrafUser.first_name || "there"
+    }! ⭐\nReady to place an order!!`,
+    Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
+  );
+
   //save user
   const userData = {
     chatId: ctx.chat.id,
@@ -73,14 +74,6 @@ bot.start(async (ctx) => {
   };
 
   await saveUser(userData);
-
-  //Personalized Welcome message
-  await ctx.reply(
-    `Hello ${
-      telegrafUser.first_name || "there"
-    }! ⭐\nReady to place an order!!`,
-    Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
-  );
 });
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
@@ -108,34 +101,74 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
   });
 
   //Update Order Status
-  await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+  let order = await updateOrderStatus(
+    orderId,
+    OrderStatus.CONFIRMED,
+    OrderStep.AWAITING_PHONE
+  );
 
-  // Step1: Ask for phone number
+  // Ask the user to type their phone number instead of sharing it
   await bot.telegram.sendMessage(
     chatId,
-    `Please share your phone number for the order.`,
-    Markup.keyboard([Markup.button.contactRequest("📞 Share Phone Number")])
-      .oneTime()
-      .resize()
+    `Please type your phone number example: 096888888`
   );
+
+  bot.on("text", async (ctx) => {
+    const chatId = String(ctx.message.chat.id);
+    const userInput = ctx.message?.text;
+
+    if (!userInput) {
+      return;
+    }
+
+    // Get order
+    order = await getOrderById(orderId);
+    console.log("ORder test", order);
+
+    if (order.currentStep === OrderStep.AWAITING_PHONE) {
+      if (validatePhoneNumber(userInput)) {
+        await ctx.reply(`Thank you! Your phone number has been recorded.`);
+        await updateOrderPhoneNumber(
+          orderId,
+          userInput,
+          OrderStep.AWAITING_LOCATION
+        );
+        await ctx.reply(`Please type in your location for delivery.`);
+      } else {
+        await ctx.reply(
+          `The phone number you entered is invalid. Please try again.`
+        );
+      }
+    } else if (order.currentStep === OrderStep.AWAITING_LOCATION) {
+      await updateOrderLocation(orderId, userInput, OrderStep.COMPLETED);
+      await ctx.reply(`Thank you! Your location has been set to ${userInput}.`);
+
+      await bot.telegram.sendMessage(
+        chatId!, // Customer's Telegram chat ID
+        `How would you like to pay?`,
+        Markup.inlineKeyboard([
+          [
+            {
+              text: "🚚 Pay via delivery",
+              callback_data: `pay_delivery:${chatId}:${orderId}`,
+            },
+            {
+              text: "🏦 Pay via bank",
+              callback_data: `pay_bank:${chatId}:${orderId}`,
+            },
+          ],
+        ])
+      );
+    }
+  });
 });
 
-// await bot.telegram.sendMessage(
-//   chatId!, // Customer's Telegram chat ID
-//   `How would you like to pay?`,
-//   Markup.inlineKeyboard([
-//     [
-//       {
-//         text: "🚚 Pay via delivery",
-//         callback_data: `pay_delivery:${chatId}:${orderId}`,
-//       },
-//       {
-//         text: "🏦 Pay via bank",
-//         callback_data: `pay_bank:${chatId}:${orderId}`,
-//       },
-//     ],
-//   ])
-// );
+// Helper function to validate phone number
+function validatePhoneNumber(phoneNumber: string) {
+  const phoneRegex = /^\+?[0-9]{10,15}$/;
+  return phoneRegex.test(phoneNumber);
+}
+
 bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   await handleRejectOrder(ctx);
 });
@@ -161,6 +194,8 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
   const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/img/aba_qr.jpg`;
 
+  const order = await getOrderById(orderId);
+
   // Simulate typing to make it feel more interactive
   await ctx.sendChatAction("upload_photo");
   await new Promise((resolve) => setTimeout(resolve, 1000)); //Wait 1 second
@@ -169,10 +204,9 @@ bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
     caption: dedent(`
         📷 Here is our ABA QR.
         
-        📝 Please transfer the amount and send the transaction receipt 
+        📝 Please transfer the total amount of $ ${order.total}  
+        and send the transaction receipt 
         in this chat once the payment is completed.
-        
-        🛑 If you encounter any issues, feel free to contact us.
       `),
     reply_markup: {
       inline_keyboard: [
@@ -259,80 +293,33 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
   );
 });
 
-// Hanlde phone number when user share contact
-bot.on("contact", async (ctx) => {
-  const chatId = ctx.chat.id;
-
-  const phoneNumber = ctx.message.contact.phone_number;
-
-  // Save customer phone number into db order
-  const updatedUserr = await updateUserPhoneNumber(chatId, phoneNumber);
-
-  ctx.reply(`Thank you! We received your phone number: ${phoneNumber}`);
-
-  // Step 2: Ask for the location
-  // Ask for the location next
-  await ctx.reply("Please type in your delivery location.");
-});
-
-bot.on("text", async (ctx) => {
-  const chatId = ctx.chat.id;
-  const location = ctx.message.text;
-
-  await ctx.reply(`Your delivery location has been set to: ${location}`);
-  
-  // Save location into order table
-  const order = await getOrderByChatId(chatId);
-
-  await updateOrderLocation(order._id, location);
-
-  console.log("ORder", order);
-  await bot.telegram.sendMessage(
-    chatId!, // Customer's Telegram chat ID
-    `How would you like to pay?`,
-    Markup.inlineKeyboard([
-      [
-        {
-          text: "🚚 Pay via delivery",
-          callback_data: `pay_delivery:${chatId}:${order._id}`,
-        },
-        {
-          text: "🏦 Pay via bank",
-          callback_data: `pay_bank:${chatId}:${order._id}`,
-        },
-      ],
-    ])
-  );
-});
-
-//Ask user to share Location
-bot.command("location", (ctx) => {
-  ctx.reply(
-    "Please share your location to procceed with your order",
-    Markup.keyboard([Markup.button.locationRequest("📍 Share Location")])
-      .oneTime()
-      .resize()
-  );
-});
-
 // Command ask for support
-bot.command("support", async (ctx) => {
-  await ctx.reply("How would you like to contact support?", {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: "📧 Send Message to Support",
-            callback_data: "send_support_message",
-          },
-        ],
-        [{ text: "📞 Call Support", callback_data: "call_support" }],
-      ],
-    },
-  });
-});
+bot.command("contactsupport", async (ctx) => {
+  await ctx.reply(
+    dedent(`
+    📞 Contact shop's ower:
 
-// Handle Button action
+    📱 Phone Number: +85561664996
+    `),
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "📸 Instagram",
+              url: "https://instagram.com/yourInstagramHandle",
+            },
+            {
+              text: "💬 Telegram",
+              url: "https://t.me/chanminea_sarann",
+            },
+          ],
+        ],
+      },
+    }
+  );
+});
 
 // Set the webhook only in production and avoid during build
 if (process.env.NODE_ENV === "production") {

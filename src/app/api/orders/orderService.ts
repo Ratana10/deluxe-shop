@@ -3,7 +3,7 @@ import Counter from "@/models/Counter";
 import Order from "@/models/Order";
 import OrderDetail from "@/models/OrderDetail";
 import { CartItem } from "@/types";
-import { OrderStatus, PaymentStatus } from "@/types/enums";
+import { OrderStatus, OrderStep, PaymentStatus } from "@/types/enums";
 
 export async function createOrder(
   chatId: string,
@@ -35,6 +35,7 @@ export async function createOrder(
       total: totalPrice,
       paymentStaus: PaymentStatus.PENDING,
       location: "",
+      currentStep: OrderStep.AWATING_CONFIRM,
       orderNumber: orderNumber
     });
 

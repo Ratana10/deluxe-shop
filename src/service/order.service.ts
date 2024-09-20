@@ -65,12 +65,16 @@ export async function getOrderById(orderId: string) {
   return await Order.findById(orderId);
 }
 
-export async function updateOrderStatus(orderId: string, status: string) {
+export async function updateOrderStatus(
+  orderId: string,
+  status: string,
+  step: string
+) {
   await connectMongoDB();
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { orderStatus: status },
+    { orderStatus: status, currentStep: step },
     { new: true }
   );
 

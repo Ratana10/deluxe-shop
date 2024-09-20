@@ -1,9 +1,7 @@
 import { getOrderById, updateOrderStatus } from "@/service/order.service";
 import bot from "./bot";
-import { Context, Markup } from "telegraf";
-import path from "path";
-import fs from "fs";
-import { OrderStatus } from "@/types/enums";
+import { Markup } from "telegraf";
+import { OrderStatus, OrderStep } from "@/types/enums";
 
 export async function handleConfirmOrder(ctx: any) {
   const [chatId, orderId] = ctx.match.slice(1);
@@ -34,8 +32,8 @@ export async function handleConfirmOrder(ctx: any) {
   // );
 
   //Update Order Status
-  await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
-  
+  // await updateOrderStatus(orderId, OrderStatus.CONFIRMED);
+
   await bot.telegram.sendMessage(
     chatId!, // Customer's Telegram chat ID
     `How would you like to pay?`,
@@ -52,8 +50,6 @@ export async function handleConfirmOrder(ctx: any) {
       ],
     ])
   );
-
-  
 }
 
 export async function handleRejectOrder(ctx: any) {
@@ -83,7 +79,7 @@ export async function handleRejectOrder(ctx: any) {
   );
 
   //Update Order Status
-  await updateOrderStatus(orderId, OrderStatus.REJECTED);
+  await updateOrderStatus(orderId, OrderStatus.REJECTED, OrderStep.REJECTED);
 }
 
 export async function handlePhotoUpload(ctx: any, sellerChatId: string) {

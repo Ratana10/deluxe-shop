@@ -3,13 +3,14 @@ import Order from "@/models/Order";
 
 export async function updateOrderPhoneNumber(
   orderId: string,
-  phoneNumber: string
+  phoneNumber: string,
+  step: string
 ) {
   await connectMongoDB();
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { phoneNumber: phoneNumber },
+    { phoneNumber: phoneNumber, currentStep: step },
     { new: true }
   );
 
@@ -20,12 +21,12 @@ export async function updateOrderPhoneNumber(
   return updatedOrder;
 }
 
-export async function updateOrderLocation(orderId: string, location: string) {
+export async function updateOrderLocation(orderId: string, location: string, step: string) {
   await connectMongoDB();
 
   const updatedOrder = await Order.findByIdAndUpdate(
     orderId,
-    { location: location },
+    { location: location, currentStep: step },
     { new: true }
   );
 
@@ -48,4 +49,9 @@ export async function getOrderByChatId(chatId: number) {
   }
 
   return order;
+}
+
+export async function getOrderById(orderId: string) {
+  await connectMongoDB();
+  return await Order.findById(orderId);
 }
