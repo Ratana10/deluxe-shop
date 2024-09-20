@@ -297,9 +297,9 @@ bot.action(/verify_transaction:(.+):(.+)/, async (ctx) => {
 bot.command("contactsupport", async (ctx) => {
   await ctx.reply(
     dedent(`
-    📞 Contact shop's ower:
+    If you have any problems, Please kindly direct message to the shop's ower
 
-    📱 Phone Number: +85561664996
+    📱 Phone Number: +855 61 664 996
     `),
     {
       parse_mode: "Markdown",
