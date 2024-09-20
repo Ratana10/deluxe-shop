@@ -1,5 +1,5 @@
+import { updateOrderPaymentStatus } from "@/service/db/order.service";
 import { NextRequest, NextResponse } from "next/server";
-import { updatePaymentStatus } from "../orderService";
 
 export async function PUT(
   req: NextRequest,
@@ -10,11 +10,7 @@ export async function PUT(
   try {
     const { paymentStatus } = await req.json();
 
-    console.log("payment Status", paymentStatus, orderId);
-
-
-    const updatedOrder = await updatePaymentStatus(orderId, paymentStatus);
-
+    const updatedOrder = await updateOrderPaymentStatus(orderId, paymentStatus);
 
     return NextResponse.json(
       { message: "Payment status updated successfully", order: updatedOrder },

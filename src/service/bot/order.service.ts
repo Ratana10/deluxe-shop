@@ -21,7 +21,6 @@ export const updatePaymentStatus = async (
     }
 
     const data = await res.json();
-    console.log("Updated Order Response", data);
 
     return {
       message: data.message,

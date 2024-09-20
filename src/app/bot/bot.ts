@@ -1,6 +1,5 @@
 import { Context, Markup, session, Telegraf } from "telegraf";
 import dotenv from "dotenv";
-import { saveUser } from "@/service/user.service";
 import { OrderStatus, PaymentStatus } from "@/types/enums";
 import dedent from "dedent";
 import {
@@ -10,6 +9,7 @@ import {
   updateOrderPhoneNumber,
   updateOrderStatus,
 } from "@/service/db/order.service";
+import { createUser } from "@/service/db/user.service";
 
 // Bot type
 export interface SessionData {
@@ -72,7 +72,7 @@ bot.start(async (ctx) => {
     phoneNumber: "",
   };
 
-  await saveUser(userData);
+  await createUser(userData);
 });
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
@@ -119,7 +119,6 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
 
     // Get order
     order = await getOrderById(orderId);
-    console.log("Order", order);
 
     if (order.orderStatus === OrderStatus.AWAITING_PHONE) {
       if (validatePhoneNumber(userInput)) {

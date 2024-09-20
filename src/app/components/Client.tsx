@@ -15,7 +15,6 @@ export default function Client({products}: Props) {
 
   useEffect(() => {
     if (chatId) {
-      console.log("Chat ID from URL params:", chatId);
       localStorage.setItem("chatId", chatId);
     } else {
 

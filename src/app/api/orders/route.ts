@@ -1,10 +1,10 @@
 import bot from "@/app/bot/bot";
 import User from "@/models/User";
+import { createOrder, updateCustomerMessageId } from "@/service/db/order.service";
 import { format } from "date-fns";
 import dedent from "dedent";
 import { NextRequest, NextResponse } from "next/server";
 import { Markup } from "telegraf";
-import { createOrder, updateCustomerMessageId } from "./orderService";
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,7 +45,6 @@ export async function POST(req: NextRequest) {
 
     const user = await User.findOne({ chatId });
 
-    console.log("user ", user);
 
     // Seller message
     const sellerMessage = dedent(
