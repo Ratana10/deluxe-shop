@@ -27,7 +27,8 @@ export async function createUser(customer: Customer) {
     phoneNumber: "",
   });
 
-  await newUser.save();
+  const user = await newUser.save();
+  console.log("test user", user);
 }
 export async function updateUserPhoneNumber(
   chatId: number,

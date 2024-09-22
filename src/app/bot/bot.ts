@@ -55,13 +55,7 @@ bot.start(async (ctx) => {
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
   const telegrafUser = ctx.from;
 
-  //Personalized Welcome message
-  await ctx.reply(
-    `Hello ${
-      telegrafUser.first_name || "there"
-    }! ⭐\nReady to place an order!!`,
-    Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
-  );
+ 
 
   //save user
   const userData = {
@@ -73,6 +67,14 @@ bot.start(async (ctx) => {
   };
 
   await createUser(userData);
+
+   //Personalized Welcome message
+   await ctx.reply(
+    `Hello ${
+      telegrafUser.first_name || "there"
+    }! ⭐\nReady to place an order!!`,
+    Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
+  );
 });
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
