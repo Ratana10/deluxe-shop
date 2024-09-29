@@ -17,7 +17,7 @@ const UserSchema: Schema = new Schema(
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     chatId: { type: Number, required: true, unique: true },
-    phoneNumber: { type: String, required: false, unique: true },
+    phoneNumber: { type: String, required: false },
     botUsed: { type: Number, default: 1 },
   },
   {

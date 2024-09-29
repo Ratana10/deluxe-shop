@@ -61,8 +61,8 @@ bot.start(async (ctx) => {
   const userData = {
     chatId: ctx.chat.id,
     username: telegrafUser.username || "Unknow",
-    firstName: telegrafUser.first_name || "",
-    lastName: telegrafUser.last_name || "",
+    firstName: telegrafUser.first_name || "Unknow",
+    lastName: telegrafUser.last_name || "Unknow",
     phoneNumber: "",
   };
 

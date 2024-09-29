@@ -18,6 +18,8 @@ export async function createUser(customer: Customer) {
     return;
   }
 
+  console.log("Create user", customer);
+
   const newUser = new User({
     chatId: customer.chatId,
     username: customer.username,
