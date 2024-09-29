@@ -55,8 +55,6 @@ bot.start(async (ctx) => {
   const webUrl = `${WEB_LINK}?chat_id=${ctx.chat.id}`;
   const telegrafUser = ctx.from;
 
- 
-
   //save user
   const userData = {
     chatId: ctx.chat.id,
@@ -68,8 +66,8 @@ bot.start(async (ctx) => {
 
   await createUser(userData);
 
-   //Personalized Welcome message
-   await ctx.reply(
+  //Personalized Welcome message
+  await ctx.reply(
     `Hello ${
       telegrafUser.first_name || "there"
     }! ⭐\nReady to place an order!!`,

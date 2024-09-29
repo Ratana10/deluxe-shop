@@ -1,26 +1,28 @@
 import type { Metadata } from "next";
 import { Lora } from "next/font/google";
-import {Playfair_Display} from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
+import "leaflet/dist/leaflet.css";
 
 const lora = Lora({
   subsets: ["latin"],
 });
 
 const playfair = Playfair_Display({
-  weight: ["400", "700"], 
-  style: 'normal',   
-  subsets: ['latin'], 
+  weight: ["400", "700"],
+  style: "normal",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: {
     default: "Deluxe",
-    template: "%s - Deluxe"
+    template: "%s - Deluxe",
   },
   description: "Deluxe shop",
 };
@@ -37,6 +39,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#360505" />
       </head>
       <body className={`${lora.className} flex flex-col min-h-screen`}>
+        <Script
+          src="https://telegram.org/js/telegram-web-app.js"
+          strategy="afterInteractive"
+        />
         <Toaster />
         {/* Header should stay at the top */}
         <CartProvider>
