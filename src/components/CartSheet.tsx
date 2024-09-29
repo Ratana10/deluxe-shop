@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetClose,
@@ -16,10 +16,32 @@ import { Minus, Plus, ShoppingCart, Trash } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { CartItem } from "@/types";
 import { toast } from "react-hot-toast";
+import { getWebApp } from "@/utils/getWebApp";
+import { useRouter } from "next/navigation";
 
 const CartSheet = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isOpen) {
+      const tg = getWebApp();
+
+      if (!cart.length) {
+        // If the cart is empty, disable the button
+        tg.MainButton.hide(); // or you could disable it instead of hiding
+      } else {
+        // Set the main button for placing an order
+        tg.MainButton.setText("Place Order");
+        tg.MainButton.show();
+        tg.MainButton.onClick(() => {
+          router.push("/payments");
+        });
+      }
+    }
+  }, [isOpen]);
 
   const { totalQuantity, cart, clearCart, increaseQuantity, decreaseQuantity } =
     useCart();
@@ -61,7 +83,8 @@ const CartSheet = () => {
       }),
       {
         loading: "Loading ...",
-        success: "Order Placed successfully\nPlease check your telegram notification",
+        success:
+          "Order Placed successfully\nPlease check your telegram notification",
         error: "Order failed! Please try again.",
       }
     );
