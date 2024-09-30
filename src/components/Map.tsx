@@ -38,12 +38,11 @@ const Map = ({ onLocationSelect }: Props) => {
           setSelectedLocation(null); // Clear selected location when getting current location
           setCurrentLocation({ lat: latitude, lng: longitude });
 
-
-        // Set the map center and zoom in
-        if (mapRef.current) {
-          mapRef.current.setCenter(newLocation);
-          mapRef.current.setZoom(15); // Adjust zoom level as needed, for example, to 15
-        }
+          // Set the map center and zoom in
+          if (mapRef.current) {
+            mapRef.current.setCenter(newLocation);
+            mapRef.current.setZoom(15); // Adjust zoom level as needed, for example, to 15
+          }
         },
         (error) => {
           console.error("Error getting location: ", error);
@@ -60,8 +59,18 @@ const Map = ({ onLocationSelect }: Props) => {
       const lng = event.latLng.lng();
       const location = { lat, lng };
       setSelectedLocation(location);
-      setCurrentLocation(null);
+      setCurrentLocation(location);
     }
+  };
+
+  const mapOptions = {
+    zoomControl: true, // Optional: Add or remove control features as needed
+    mapTypeControl: false,
+    scaleControl: false,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: true,
+    gestureHandling: "greedy", // This setting enables one-finger dragging on mobile
   };
 
   // Add a custom control button to get current location
@@ -95,7 +104,8 @@ const Map = ({ onLocationSelect }: Props) => {
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={currentLocation || center}
-        zoom={10}
+        zoom={15}
+        options={mapOptions}
         onClick={handleMapClick}
         onLoad={onMapLoad}
       >
