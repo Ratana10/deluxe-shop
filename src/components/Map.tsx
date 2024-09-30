@@ -3,7 +3,7 @@
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { useRef, useState } from "react";
 
-const containerStyle = { width: "100%", height: "600px", margin: "auto" };
+const containerStyle = { width: "100%", height: "400px", margin: "auto" };
 const center = {
   lat: -3.745,
   lng: -38.523,
@@ -33,8 +33,17 @@ const Map = ({ onLocationSelect }: Props) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          const newLocation = { lat: latitude, lng: longitude };
+
           setSelectedLocation(null); // Clear selected location when getting current location
           setCurrentLocation({ lat: latitude, lng: longitude });
+
+
+        // Set the map center and zoom in
+        if (mapRef.current) {
+          mapRef.current.setCenter(newLocation);
+          mapRef.current.setZoom(15); // Adjust zoom level as needed, for example, to 15
+        }
         },
         (error) => {
           console.error("Error getting location: ", error);
