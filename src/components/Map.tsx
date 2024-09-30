@@ -1,16 +1,25 @@
 "use client";
 
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  Marker,
+  useJsApiLoader,
+} from "@react-google-maps/api";
+import { Markazi_Text } from "next/font/google";
 import { useRef, useState } from "react";
 
-const containerStyle = { width: "100%", height: "400px", margin: "auto" };
+const containerStyle = {
+  width: "100%",
+  height: "350px",
+  margin: "auto",
+};
 const center = {
   lat: -3.745,
   lng: -38.523,
 };
 
 interface Props {
-  onLocationSelect: (location: { lat: number; lng: number }) => void;
+  onLocationSelect: (address: string) => void;
 }
 
 const Map = ({ onLocationSelect }: Props) => {
@@ -25,43 +34,19 @@ const Map = ({ onLocationSelect }: Props) => {
   } | null>(null);
 
   const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
+    null
+  );
+
   const locationButtonAdded = useRef(false);
 
-  // Handle getting the user's current location
-  const handleGetLocationClick = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const newLocation = { lat: latitude, lng: longitude };
+  // laod script for google map
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+  });
 
-          setSelectedLocation(null); // Clear selected location when getting current location
-          setCurrentLocation({ lat: latitude, lng: longitude });
-
-          // Set the map center and zoom in
-          if (mapRef.current) {
-            mapRef.current.setCenter(newLocation);
-            mapRef.current.setZoom(15); // Adjust zoom level as needed, for example, to 15
-          }
-        },
-        (error) => {
-          console.error("Error getting location: ", error);
-        }
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
-  };
-
-  const handleMapClick = (event: google.maps.MapMouseEvent) => {
-    if (event.latLng) {
-      const lat = event.latLng.lat();
-      const lng = event.latLng.lng();
-      const location = { lat, lng };
-      setSelectedLocation(location);
-      setCurrentLocation(location);
-    }
-  };
+  if (!isLoaded) return <div>Loading....</div>;
 
   const mapOptions = {
     zoomControl: true, // Optional: Add or remove control features as needed
@@ -99,21 +84,113 @@ const Map = ({ onLocationSelect }: Props) => {
     }
   };
 
+  // Function to perform reverse geocoding
+  const fetchAddress = async (lat: number, lng: number) => {
+    const geocoder = new google.maps.Geocoder();
+    const latlng = { lat, lng };
+    try {
+      const result = await geocoder.geocode({ location: latlng });
+      if (result.results[0]) {
+        const addressComponents = result.results[0].address_components;
+
+        // Extract specific address components
+        const houseNumber = addressComponents.find((comp) =>
+          comp.types.includes("street_number")
+        )?.long_name;
+        const street = addressComponents.find((comp) =>
+          comp.types.includes("route")
+        )?.long_name;
+        const sangkat = addressComponents.find((comp) =>
+          comp.types.includes("sublocality")
+        )?.long_name;
+        const khan = addressComponents.find((comp) =>
+          comp.types.includes("administrative_area_level_2")
+        )?.long_name;
+        const cityOrProvince = addressComponents.find((comp) =>
+          comp.types.includes("administrative_area_level_1")
+        )?.long_name;
+        const country = addressComponents.find((comp) =>
+          comp.types.includes("country")
+        )?.long_name;
+
+        // Build the Cambodian address format
+        const cambodianAddress = `${houseNumber || ""} ${
+          street || ""
+        }, Sangkat ${sangkat || ""}, Khan ${khan || ""}, ${
+          cityOrProvince || ""
+        }, ${country || ""}`;
+
+        return cambodianAddress.trim(); // Return the formatted address
+      } else {
+        console.error("No address found for the selected location");
+        return null;
+      }
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      return null;
+    }
+  };
+
+
+  const handleMapClick = async (event: google.maps.MapMouseEvent) => {
+    if (event.latLng) {
+      const lat = event.latLng.lat();
+      const lng = event.latLng.lng();
+      const location = { lat, lng };
+      setSelectedLocation(location);
+      setCurrentLocation(location);
+
+      const address = await fetchAddress(lat, lng);
+      if (address) {
+        onLocationSelect(address);
+      }
+    }
+  };
+
+  // Handle getting the user's current location
+  const handleGetLocationClick = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          const newLocation = { lat: latitude, lng: longitude };
+
+          const address = await fetchAddress(latitude, longitude); // Fetch address for user's current location
+          if (address) {
+            onLocationSelect(address); // Only pass the address to parent
+          }
+
+          setSelectedLocation(null); // Clear selected location when getting current location
+          setCurrentLocation({ lat: latitude, lng: longitude });
+
+          // Set the map center and zoom in
+          if (mapRef.current) {
+            mapRef.current.setCenter(newLocation);
+            mapRef.current.setZoom(15); // Adjust zoom level as needed, for example, to 15
+          }
+        },
+        (error) => {
+          console.error("Error getting location: ", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  };
+
   return (
-    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={currentLocation || center}
-        zoom={15}
-        options={mapOptions}
-        onClick={handleMapClick}
-        onLoad={onMapLoad}
-      >
-        {/* Add a marker at the selected location */}
-        {selectedLocation && <Marker position={selectedLocation} />}
-        {currentLocation && <Marker position={currentLocation} />}
-      </GoogleMap>
-    </LoadScript>
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      center={currentLocation || center}
+      zoom={15}
+      options={mapOptions}
+      onClick={handleMapClick}
+      onLoad={onMapLoad}
+    >
+      {/* Add a marker at the selected location */}
+      {selectedLocation && <Marker position={selectedLocation} />}
+      {currentLocation && <Marker position={currentLocation} />}
+    </GoogleMap>
   );
 };
 
