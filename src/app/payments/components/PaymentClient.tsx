@@ -3,6 +3,7 @@
 import { LatLngLiteral } from "leaflet";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import Map from "@/components/Map";
 
 const MapSelector = dynamic(() => import("@/components/MapSelector"), {
   ssr: false,
@@ -10,9 +11,15 @@ const MapSelector = dynamic(() => import("@/components/MapSelector"), {
 
 const PaymentClient = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [location, setLocation] = useState<LatLngLiteral | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
 
-  const handleLocationSelect = (selectedLocation: LatLngLiteral) => {
+  // Handle location selection from the map
+  const handleLocationSelect = (selectedLocation: {
+    lat: number;
+    lng: number;
+  }) => {
     setLocation(selectedLocation);
   };
 
@@ -45,7 +52,7 @@ const PaymentClient = () => {
             Select Your Location
           </label>
           <div className="mt-2">
-            <MapSelector onLocationSelect={handleLocationSelect} />
+            <Map onLocationSelect={handleLocationSelect} />
           </div>
         </div>
 
