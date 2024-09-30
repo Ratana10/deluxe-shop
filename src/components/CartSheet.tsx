@@ -18,6 +18,7 @@ import { CartItem } from "@/types";
 import { toast } from "react-hot-toast";
 import { getWebApp } from "@/utils/getWebApp";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const CartSheet = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,23 +26,23 @@ const CartSheet = () => {
 
   const router = useRouter();
 
-  useEffect(() => {
-    if (isOpen) {
-      const tg = getWebApp();
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     const tg = getWebApp();
 
-      if (!cart.length) {
-        // If the cart is empty, disable the button
-        tg.MainButton.hide(); // or you could disable it instead of hiding
-      } else {
-        // Set the main button for placing an order
-        tg.MainButton.setText("Place Order");
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-          router.push("/payments");
-        });
-      }
-    }
-  }, [isOpen]);
+  //     if (!cart.length) {
+  //       // If the cart is empty, disable the button
+  //       tg.MainButton.hide(); // or you could disable it instead of hiding
+  //     } else {
+  //       // Set the main button for placing an order
+  //       tg.MainButton.setText("Place Order");
+  //       tg.MainButton.show();
+  //       tg.MainButton.onClick(() => {
+  //         router.push("/payments");
+  //       });
+  //     }
+  //   }
+  // }, [isOpen]);
 
   const { totalQuantity, cart, clearCart, increaseQuantity, decreaseQuantity } =
     useCart();
@@ -187,13 +188,14 @@ const CartSheet = () => {
           </div>
           <SheetFooter className="">
             <SheetClose asChild>
-              <button
-                className={`btn-primary w-full mt-3`}
-                onClick={onOrder}
-                disabled={cart.length === 0}
-              >
-                Place Order
-              </button>
+              <Link href="/payments">
+                <button
+                  className={`btn-primary w-full mt-3`}
+                  disabled={cart.length === 0}
+                >
+                  Checkout
+                </button>
+              </Link>
             </SheetClose>
             <button className=" w-full mt-3 btn-secondary" onClick={clearCart}>
               Clear Cart
