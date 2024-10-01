@@ -55,7 +55,7 @@ export interface CartContextType {
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
   clearCart: () => void;
-  totalQuantity: number;
+  total: number;
 }
 
 // Bot type
