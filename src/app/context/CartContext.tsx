@@ -62,15 +62,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("cart");
   };
 
-  const total = cart.reduce(
-    (total: number, item: CartItem) => total + item.quantity,
+  const totalQuantity = cart.reduce(
+    (t: number, item: CartItem) => t + item.quantity,
+    0
+  );
+
+  const totalAmount = cart.reduce(
+    (t: number, item: CartItem) => t + item.quantity * item.price,
     0
   );
 
   return (
     <CartContext.Provider
       value={{
-        total,
+        totalQuantity,
+        totalAmount,
         cart,
         addToCart,
         removeFromCart,

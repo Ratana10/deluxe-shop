@@ -49,13 +49,14 @@ export interface CartItem {
 }
 
 export interface CartContextType {
+  totalQuantity: number;
+  totalAmount: number;
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
   clearCart: () => void;
-  total: number;
 }
 
 // Bot type

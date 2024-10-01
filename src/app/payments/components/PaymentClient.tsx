@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -13,31 +13,82 @@ import {
 import Map from "@/components/Map";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/app/context/CartContext";
-import { getWebApp } from "@/utils/getWebApp";
 import toast from "react-hot-toast";
+import { useTelegram } from "@/app/hooks/useTelegram";
 
 const PaymentClient = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState<string>("");
+  const [address, setAddress] = useState<string>("default");
   const [isPaid, setIsPaid] = useState(false);
 
   const [expandedItems, setExpandedItems] = useState<string[]>([""]); // State to track expanded items (string[])
 
-  const { cart, clearCart, total } = useCart();
+  const { cart, clearCart, totalAmount } = useCart();
+  const { tg, queryId } = useTelegram();
+
+   // Memoize the onMainButtonClick function using useCallback
+   const onMainButtonClick = useCallback(() => {
+    console.log("Main button clicked");
+
+    const orderDetails = cart.map((item) => ({
+      productId: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const order = {
+      phoneNumber,
+      address,
+      isPaid,
+      total: totalAmount,
+      queryId,
+      orderDetails,
+    };
+
+    toast.promise(
+      fetch("/api/v1/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      }).then(async (res) => {
+        if (res.ok) {
+          clearCart(); // Clear cart on success
+        } else {
+          throw new Error("Order failed");
+        }
+      }),
+      {
+        loading: "Loading ...",
+        success:
+          "Order Placed successfully\nPlease check your telegram notification",
+        error: "Order failed! Please try again.",
+      }
+    );
+
+    console.table(order);
+  }, [phoneNumber, address, isPaid, totalAmount, queryId, cart, clearCart]);
 
   useEffect(() => {
-    if (phoneNumber && address && isPaid) {
-      console.log("Main button show");
-      onMainButtonClick();
+    if (typeof window !== "undefined" && tg) {
+      if (phoneNumber && isPaid) {
+        console.log("Main button show");
 
-      // show tg main button
-      // const tg = getWebApp();
-      // tg.MainButton.setText("Place Order");
-      // tg.MainButton.show();
-      // tg.MainButton.onClick(() => {onMainButtonClick});
+        // show tg main button
+        tg.MainButton.setText("Place Order");
+        tg.MainButton.show();
+        tg.MainButton.onClick(onMainButtonClick);
+
+        // Cleanup when component unmounts
+        return () => {
+          tg.MainButton.hide();
+          tg.MainButton.offClick(onMainButtonClick);
+        };
+      }
     }
-  }, [phoneNumber, address, isPaid]);
-
+  }, [phoneNumber, isPaid, tg]);
   // Handle location selection from the map
   const handleLocationSelect = (address: string) => {
     console.log("address", address);
@@ -55,58 +106,60 @@ const PaymentClient = () => {
     setExpandedItems(newItems);
   };
 
-  const onMainButtonClick = () => {
-    // const isConfirmed = window.confirm(
-    //   "Are you sure you want to place the order?"
-    // );
+  // const onMainButtonClick = () => {
+  //   console.log("clicked");
+  //   // const isConfirmed = window.confirm(
+  //   //   "Are you sure you want to place the order?"
+  //   // );
 
-    // if (!isConfirmed) {
-    //   return;
-    // }
+  //   // if (!isConfirmed) {
+  //   //   return;
+  //   // }
 
-    // Prepare data
+  //   // Prepare data
 
-    const orderDetails = cart.map((item) => ({
-      productId: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      price: item.price,
-    }));
+  //   const orderDetails = cart.map((item) => ({
+  //     productId: item.id,
+  //     name: item.name,
+  //     quantity: item.quantity,
+  //     price: item.price,
+  //   }));
 
-    const order = {
-      phoneNumber,
-      address,
-      isPaid,
-      total,
-      orderDetails,
-    };
+  //   const order = {
+  //     phoneNumber,
+  //     address,
+  //     isPaid,
+  //     total: totalAmount,
+  //     queryId,
+  //     orderDetails,
+  //   };
 
-    // toast.promise(
-    //   fetch("/api/orders", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ cart }),
-    //   }).then(async (res) => {
-    //     if (res.ok) {
-    //       clearCart(); //Clear cart on success
-    //     } else {
-    //       throw new Error("Order fail");
-    //     }
-    //   }),
-    //   {
-    //     loading: "Loading ...",
-    //     success:
-    //       "Order Placed successfully\nPlease check your telegram notification",
-    //     error: "Order failed! Please try again.",
-    //   }
-    // );
+  //   toast.promise(
+  //     fetch("/api/v1/orders", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(order),
+  //     }).then(async (res) => {
+  //       if (res.ok) {
+  //         // clearCart(); //Clear cart on success
+  //       } else {
+  //         throw new Error("Order fail");
+  //       }
+  //     }),
+  //     {
+  //       loading: "Loading ...",
+  //       success:
+  //         "Order Placed successfully\nPlease check your telegram notification",
+  //       error: "Order failed! Please try again.",
+  //     }
+  //   );
 
-    // Here you can send the data to your server or process the order
+  //   // Here you can send the data to your server or process the order
 
-    console.table(order);
-  };
+  //   console.table(order);
+  // };
 
   return (
     <div className="container mx-auto px-4 py-8">

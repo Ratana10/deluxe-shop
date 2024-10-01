@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Sheet,
   SheetClose,
@@ -12,45 +12,26 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Image from "next/image";
-import { Minus, Plus, ShoppingCart, Trash } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { CartItem } from "@/types";
 import { toast } from "react-hot-toast";
-import { getWebApp } from "@/utils/getWebApp";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const CartSheet = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     const tg = getWebApp();
-
-  //     if (!cart.length) {
-  //       // If the cart is empty, disable the button
-  //       tg.MainButton.hide(); // or you could disable it instead of hiding
-  //     } else {
-  //       // Set the main button for placing an order
-  //       tg.MainButton.setText("Place Order");
-  //       tg.MainButton.show();
-  //       tg.MainButton.onClick(() => {
-  //         router.push("/payments");
-  //       });
-  //     }
-  //   }
-  // }, [isOpen]);
-
-  const { total, cart, clearCart, increaseQuantity, decreaseQuantity } =
-    useCart();
-
-  const totalPrice = cart.reduce(
-    (total: number, item: CartItem) => total + item.price * item.quantity,
-    0
-  );
+  const {
+    totalQuantity,
+    totalAmount,
+    cart,
+    clearCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useCart();
 
   const onOrder = async () => {
     const chatId = localStorage.getItem("chatId");
@@ -103,7 +84,7 @@ const CartSheet = () => {
             <ShoppingCart className="w-6 h-6" />
             {/* Badge for cart item count */}
             <span className="absolute -top-1 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-red-600 rounded-full">
-              {total}
+              {totalQuantity}
             </span>
           </button>
         </SheetTrigger>
@@ -182,7 +163,7 @@ const CartSheet = () => {
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total</span>
-                <span>${totalPrice.toFixed(2)}</span>{" "}
+                <span>${totalAmount.toFixed(2)}</span>{" "}
               </div>
             </div>
           </div>
