@@ -10,6 +10,9 @@ declare global {
 
 
 
-export function getWebApp(): WebApp {
-  return window.Telegram.WebApp;
+export function getWebApp(): WebApp | null {
+  if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+    return window.Telegram.WebApp;
+  }
+  return null;
 }

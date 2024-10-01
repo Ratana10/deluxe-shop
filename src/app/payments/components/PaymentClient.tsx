@@ -13,8 +13,9 @@ import {
 import Map from "@/components/Map";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/app/context/CartContext";
+import { getWebApp } from "@/utils/getWebApp";
 import toast from "react-hot-toast";
-import { useTelegram } from "@/app/hooks/useTelegram";
+import { WebApp } from "@twa-dev/types";
 
 const PaymentClient = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -24,10 +25,18 @@ const PaymentClient = () => {
   const [expandedItems, setExpandedItems] = useState<string[]>([""]); // State to track expanded items (string[])
 
   const { cart, clearCart, totalAmount } = useCart();
-  const { tg, queryId } = useTelegram();
+  // const {tg, queryId} = useTelegram();
+  const [tg, setTg] = useState<WebApp | null>(null);
 
-   // Memoize the onMainButtonClick function using useCallback
-   const onMainButtonClick = useCallback(() => {
+  useEffect(() => {
+    const telegramApp = getWebApp();
+    if (telegramApp) {
+      setTg(telegramApp);
+    }
+  }, []);
+
+  // Memoize the onMainButtonClick function using useCallback
+  const onMainButtonClick = useCallback(() => {
     console.log("Main button clicked");
 
     const orderDetails = cart.map((item) => ({
@@ -42,7 +51,7 @@ const PaymentClient = () => {
       address,
       isPaid,
       total: totalAmount,
-      queryId,
+      queryId: "", // You can fetch or set the queryId if needed
       orderDetails,
     };
 
@@ -69,26 +78,25 @@ const PaymentClient = () => {
     );
 
     console.table(order);
-  }, [phoneNumber, address, isPaid, totalAmount, queryId, cart, clearCart]);
+  }, [phoneNumber, address, isPaid, totalAmount, cart, clearCart]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && tg) {
-      if (phoneNumber && isPaid) {
-        console.log("Main button show");
+    if (tg && phoneNumber && isPaid) {
+      console.log("Main button show");
 
-        // show tg main button
-        tg.MainButton.setText("Place Order");
-        tg.MainButton.show();
-        tg.MainButton.onClick(onMainButtonClick);
+      // Show tg main button
+      tg.MainButton.setText("Place Order");
+      tg.MainButton.show();
+      tg.MainButton.onClick(onMainButtonClick);
 
-        // Cleanup when component unmounts
-        return () => {
-          tg.MainButton.hide();
-          tg.MainButton.offClick(onMainButtonClick);
-        };
-      }
+      // Cleanup the effect when component unmounts
+      return () => {
+        tg.MainButton.hide();
+        tg.MainButton.offClick(onMainButtonClick);
+      };
     }
-  }, [phoneNumber, isPaid, tg]);
+  }, [tg, phoneNumber, isPaid, onMainButtonClick]);
+
   // Handle location selection from the map
   const handleLocationSelect = (address: string) => {
     console.log("address", address);
@@ -130,7 +138,7 @@ const PaymentClient = () => {
   //     address,
   //     isPaid,
   //     total: totalAmount,
-  //     queryId,
+  //     queryId: "",
   //     orderDetails,
   //   };
 
