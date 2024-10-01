@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -13,13 +13,89 @@ import {
 import Map from "@/components/Map";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/app/context/CartContext";
+import { getWebApp } from "@/utils/getWebApp";
+import toast from "react-hot-toast";
+import { WebApp } from "@twa-dev/types";
 
 const PaymentClient = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState<string>("");
+  const [address, setAddress] = useState<string>("default");
   const [isPaid, setIsPaid] = useState(false);
 
-  const { cart } =useCart();
+  const [expandedItems, setExpandedItems] = useState<string[]>([""]); // State to track expanded items (string[])
+
+  const { cart, clearCart, totalAmount } = useCart();
+  // const {tg, queryId} = useTelegram();
+  const [tg, setTg] = useState<WebApp | null>(null);
+
+  useEffect(() => {
+    const telegramApp = getWebApp();
+    if (telegramApp) {
+      setTg(telegramApp);
+    }
+  }, []);
+
+  // Memoize the onMainButtonClick function using useCallback
+  const onMainButtonClick = useCallback(() => {
+    console.log("Main button clicked");
+
+    const orderDetails = cart.map((item) => ({
+      productId: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const order = {
+      phoneNumber,
+      address,
+      isPaid,
+      total: totalAmount,
+      queryId: "", // You can fetch or set the queryId if needed
+      orderDetails,
+    };
+
+    toast.promise(
+      fetch("/api/v1/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      }).then(async (res) => {
+        if (res.ok) {
+          clearCart(); // Clear cart on success
+        } else {
+          throw new Error("Order failed");
+        }
+      }),
+      {
+        loading: "Loading ...",
+        success:
+          "Order Placed successfully\nPlease check your telegram notification",
+        error: "Order failed! Please try again.",
+      }
+    );
+
+    console.table(order);
+  }, [phoneNumber, address, isPaid, totalAmount, cart, clearCart]);
+
+  useEffect(() => {
+    if (tg && phoneNumber && isPaid) {
+      console.log("Main button show");
+
+      // Show tg main button
+      tg.MainButton.setText("Place Order");
+      tg.MainButton.show();
+      tg.MainButton.onClick(onMainButtonClick);
+
+      // Cleanup the effect when component unmounts
+      return () => {
+        tg.MainButton.hide();
+        tg.MainButton.offClick(onMainButtonClick);
+      };
+    }
+  }, [tg, phoneNumber, isPaid, onMainButtonClick]);
 
   // Handle location selection from the map
   const handleLocationSelect = (address: string) => {
@@ -31,32 +107,67 @@ const PaymentClient = () => {
     setIsPaid(!isPaid);
   };
 
-  const handleSubmit = () => {
-    // Validate that phone number and address are filled and user confirmed payment
-    if (!phoneNumber) {
-      alert("Please enter your phone number");
-      return;
-    }
-
-    if (!address) {
-      alert("Please select your delivery location");
-      return;
-    }
-
-    if (!isPaid) {
-      alert("Please confirm that you have already paid");
-      return;
-    }
-
-    // Here you can send the data to your server or process the order
-    const orderData = {
-      phoneNumber,
-      address,
-      isPaid,
-    };
-
-    console.log("Processing order with the following data:", orderData);
+  // Handle accordion item expansion
+  const handleAccordionChange = (value: string[]) => {
+    // Prevent collapsing: only add items to expandedItems, don't remove them
+    const newItems = Array.from(new Set([...expandedItems, ...value]));
+    setExpandedItems(newItems);
   };
+
+  // const onMainButtonClick = () => {
+  //   console.log("clicked");
+  //   // const isConfirmed = window.confirm(
+  //   //   "Are you sure you want to place the order?"
+  //   // );
+
+  //   // if (!isConfirmed) {
+  //   //   return;
+  //   // }
+
+  //   // Prepare data
+
+  //   const orderDetails = cart.map((item) => ({
+  //     productId: item.id,
+  //     name: item.name,
+  //     quantity: item.quantity,
+  //     price: item.price,
+  //   }));
+
+  //   const order = {
+  //     phoneNumber,
+  //     address,
+  //     isPaid,
+  //     total: totalAmount,
+  //     queryId: "",
+  //     orderDetails,
+  //   };
+
+  //   toast.promise(
+  //     fetch("/api/v1/orders", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(order),
+  //     }).then(async (res) => {
+  //       if (res.ok) {
+  //         // clearCart(); //Clear cart on success
+  //       } else {
+  //         throw new Error("Order fail");
+  //       }
+  //     }),
+  //     {
+  //       loading: "Loading ...",
+  //       success:
+  //         "Order Placed successfully\nPlease check your telegram notification",
+  //       error: "Order failed! Please try again.",
+  //     }
+  //   );
+
+  //   // Here you can send the data to your server or process the order
+
+  //   console.table(order);
+  // };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -75,7 +186,12 @@ const PaymentClient = () => {
         </div>
 
         {/* Accordion for Map and QR Code */}
-        <Accordion type="single" collapsible className="mt-4">
+        <Accordion
+          type="multiple" // Allow multiple sections to be open
+          value={expandedItems} // Control the expanded items state (string[])
+          onValueChange={handleAccordionChange} // Handle accordion state changes
+          className="mt-4"
+        >
           {/* Accordion Item for Map */}
           <AccordionItem value="location">
             <AccordionTrigger>Select Your Delivery Location</AccordionTrigger>

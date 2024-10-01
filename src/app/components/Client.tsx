@@ -20,15 +20,15 @@ export default function Client({ products }: Props) {
     } else {
       // console.error("Chat ID not found in URL.");
     }
-
-    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+    if (typeof window !== "undefined") {
       const tg = getWebApp();
 
-      tg.ready();
-
-      console.log("have sdk");
-    } else {
-      console.log("no sdk");
+      if (tg) {
+        tg.ready();
+        console.log("Telegram WebApp SDK is available");
+      } else {
+        console.log("Telegram WebApp SDK is not available");
+      }
     }
   }, [chatId]);
 
