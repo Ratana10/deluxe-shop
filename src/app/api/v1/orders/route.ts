@@ -115,10 +115,14 @@ export async function POST(req: NextRequest) {
           💵 Total: $${total}
           📦 Order: ${orderNumber}
           📅 Date : ${currentDate}
+          location: ${address}
+          payment: paid
     
           👤 UserDetail
           `
     );
+
+    await bot.telegram.sendMessage( process.env.TELEGRAM_CHAT_ID!, sellerMessage)
 
     return NextResponse.json({ message: "Order created successfully" });
   } catch (error) {

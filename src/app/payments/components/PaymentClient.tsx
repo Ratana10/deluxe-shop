@@ -13,27 +13,17 @@ import {
 import Map from "@/components/Map";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/app/context/CartContext";
-import { getWebApp } from "@/utils/getWebApp";
 import toast from "react-hot-toast";
-import { WebApp } from "@twa-dev/types";
+import { useTelegram } from "@/app/hooks/useTelegram";
 
 const PaymentClient = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState<string>("default");
   const [isPaid, setIsPaid] = useState(false);
-
   const [expandedItems, setExpandedItems] = useState<string[]>([""]); // State to track expanded items (string[])
 
   const { cart, clearCart, totalAmount } = useCart();
-  // const {tg, queryId} = useTelegram();
-  const [tg, setTg] = useState<WebApp | null>(null);
-
-  useEffect(() => {
-    const telegramApp = getWebApp();
-    if (telegramApp) {
-      setTg(telegramApp);
-    }
-  }, []);
+  const { tg, queryId, user, onClose, onToggleButton } = useTelegram(); // Use your useTelegram hook
 
   // Memoize the onMainButtonClick function using useCallback
   const onMainButtonClick = useCallback(() => {
@@ -51,7 +41,7 @@ const PaymentClient = () => {
       address,
       isPaid,
       total: totalAmount,
-      queryId: "", // You can fetch or set the queryId if needed
+      queryId,
       orderDetails,
     };
 
@@ -78,7 +68,7 @@ const PaymentClient = () => {
     );
 
     console.table(order);
-  }, [phoneNumber, address, isPaid, totalAmount, cart, clearCart]);
+  }, [phoneNumber, address, isPaid, totalAmount, cart, clearCart, queryId]);
 
   useEffect(() => {
     if (tg && phoneNumber && isPaid) {
@@ -109,65 +99,9 @@ const PaymentClient = () => {
 
   // Handle accordion item expansion
   const handleAccordionChange = (value: string[]) => {
-    // Prevent collapsing: only add items to expandedItems, don't remove them
     const newItems = Array.from(new Set([...expandedItems, ...value]));
     setExpandedItems(newItems);
   };
-
-  // const onMainButtonClick = () => {
-  //   console.log("clicked");
-  //   // const isConfirmed = window.confirm(
-  //   //   "Are you sure you want to place the order?"
-  //   // );
-
-  //   // if (!isConfirmed) {
-  //   //   return;
-  //   // }
-
-  //   // Prepare data
-
-  //   const orderDetails = cart.map((item) => ({
-  //     productId: item.id,
-  //     name: item.name,
-  //     quantity: item.quantity,
-  //     price: item.price,
-  //   }));
-
-  //   const order = {
-  //     phoneNumber,
-  //     address,
-  //     isPaid,
-  //     total: totalAmount,
-  //     queryId: "",
-  //     orderDetails,
-  //   };
-
-  //   toast.promise(
-  //     fetch("/api/v1/orders", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(order),
-  //     }).then(async (res) => {
-  //       if (res.ok) {
-  //         // clearCart(); //Clear cart on success
-  //       } else {
-  //         throw new Error("Order fail");
-  //       }
-  //     }),
-  //     {
-  //       loading: "Loading ...",
-  //       success:
-  //         "Order Placed successfully\nPlease check your telegram notification",
-  //       error: "Order failed! Please try again.",
-  //     }
-  //   );
-
-  //   // Here you can send the data to your server or process the order
-
-  //   console.table(order);
-  // };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -187,9 +121,9 @@ const PaymentClient = () => {
 
         {/* Accordion for Map and QR Code */}
         <Accordion
-          type="multiple" // Allow multiple sections to be open
-          value={expandedItems} // Control the expanded items state (string[])
-          onValueChange={handleAccordionChange} // Handle accordion state changes
+          type="multiple"
+          value={expandedItems}
+          onValueChange={handleAccordionChange}
           className="mt-4"
         >
           {/* Accordion Item for Map */}
