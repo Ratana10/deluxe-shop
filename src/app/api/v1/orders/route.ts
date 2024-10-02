@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       .join("\n");
 
     // Seller message
+    const orderSuccess = "✅ Order Placed successfully"
     const customerMessage = dedent(
       `
       🧾 You have placed an order:
@@ -110,24 +111,40 @@ export async function POST(req: NextRequest) {
     );
 
     // Bot
-
-    const inlineKeyboard = Markup.inlineKeyboard([
-      [{ text: "🟡 Pending", callback_data: "no_action" }],
-    ]);
-
     await bot.telegram.answerWebAppQuery(queryId!, {
       type: "article",
       id: queryId!,
       title: "Successfully",
-      input_message_content: { message_text: customerMessage },
-      reply_markup: {
-        inline_keyboard: inlineKeyboard.reply_markup.inline_keyboard,
-      },
+      input_message_content: { message_text: orderSuccess },
     });
+
+
+    const customerMsg = await bot.telegram.sendMessage(
+      chatId!, // Customer's Telegram chat ID
+      customerMessage,
+      Markup.inlineKeyboard([
+        [{ text: "🟡 Order Pending", callback_data: "no_action" }],
+      ])
+    );
+
+    await bot.telegram.sendMessage(
+      chatId!,
+      dedent(
+        `
+        Thank you for placing the orders.
+        We would love to inform you that 
+        it might take around a half day to 2 days 
+        for you to get the items.
+  
+        If you have any problem, 
+        Please kindly direct massage to the shop's owner
+        `
+      )
+    );
+
     // console.log("customer message id", cusMsgId)
     // Update the saved order with customer message ID
-    // savedOrder.cusMsgId = cusMsgId
-
+    savedOrder.cusMsgId = customerMsg.message_id
     savedOrder.save();
     // Send message to shop's ower
 
@@ -148,8 +165,20 @@ export async function POST(req: NextRequest) {
     );
 
     await bot.telegram.sendMessage(
-      process.env.TELEGRAM_CHAT_ID!,
-      sellerMessage
+      process.env.TELEGRAM_CHAT_ID!, // Seller's chat ID from environment variables
+      sellerMessage,
+      Markup.inlineKeyboard([
+        [
+          Markup.button.callback(
+            `❌ Reject`,
+            `reject_order:${chatId}:${savedOrder._id}`
+          ),
+          Markup.button.callback(
+            `✅ Confirm`,
+            `confirm_order:${chatId}:${savedOrder._id}`
+          ),
+        ],
+      ])
     );
 
     return NextResponse.json({ message: "Order created successfully" });

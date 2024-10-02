@@ -96,74 +96,91 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
 
   //update customer chat Pending to Confirm
   await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
-    inline_keyboard: [[{ text: "🟢 Confirm", callback_data: "no_action" }]],
+    inline_keyboard: [
+      [{ text: "🟢 Order Confirm", callback_data: "no_action" }],
+    ],
   });
+
+  await bot.telegram.sendMessage(
+    chatId!,
+    dedent(
+      `
+      Thank you for placing the orders.
+      We would love to inform you that 
+      it might take around a half day to 2 days 
+      for you to get the items.
+
+      If you have any problem, 
+      Please kindly direct massage to the shop's owner
+      `
+    )
+  );
 
   //Update Order Status
   let order = await updateOrderStatus(orderId, OrderStatus.AWAITING_PHONE);
 
-  // Ask the user to type their phone number
-  await bot.telegram.sendMessage(
-    chatId,
-    `Please type your phone number example: 096888888`
-  );
+  // // Ask the user to type their phone number
+  // await bot.telegram.sendMessage(
+  //   chatId,
+  //   `Please type your phone number example: 096888888`
+  // );
 
-  // Setup listener
-  bot.on("text", async (ctx) => {
-    const chatId = String(ctx.message.chat.id);
-    const userInput = ctx.message?.text;
+  // // Setup listener
+  // bot.on("text", async (ctx) => {
+  //   const chatId = String(ctx.message.chat.id);
+  //   const userInput = ctx.message?.text;
 
-    if (!userInput) {
-      return;
-    }
+  //   if (!userInput) {
+  //     return;
+  //   }
 
-    // Get order
-    order = await getOrderById(orderId);
+  //   // Get order
+  //   order = await getOrderById(orderId);
 
-    if (order.orderStatus === OrderStatus.AWAITING_PHONE) {
-      if (validatePhoneNumber(userInput)) {
-        await ctx.reply(`Thank you! Your phone number has been recorded.`);
-        await updateOrderPhoneNumber(
-          orderId,
-          userInput,
-          OrderStatus.AWAITING_LOCATION
-        );
-        await ctx.reply(`Please type in your location for delivery.`);
-      } else {
-        // Wrong phone number format
-        await ctx.reply(
-          `The phone number you entered is invalid. Please try again.`
-        );
-      }
-    } else if (order.orderStatus === OrderStatus.AWAITING_LOCATION) {
-      await ctx.reply(
-        `Thank you! Your delivery location has been set to ${userInput}.`
-      );
+  //   if (order.orderStatus === OrderStatus.AWAITING_PHONE) {
+  //     if (validatePhoneNumber(userInput)) {
+  //       await ctx.reply(`Thank you! Your phone number has been recorded.`);
+  //       await updateOrderPhoneNumber(
+  //         orderId,
+  //         userInput,
+  //         OrderStatus.AWAITING_LOCATION
+  //       );
+  //       await ctx.reply(`Please type in your location for delivery.`);
+  //     } else {
+  //       // Wrong phone number format
+  //       await ctx.reply(
+  //         `The phone number you entered is invalid. Please try again.`
+  //       );
+  //     }
+  //   } else if (order.orderStatus === OrderStatus.AWAITING_LOCATION) {
+  //     await ctx.reply(
+  //       `Thank you! Your delivery location has been set to ${userInput}.`
+  //     );
 
-      await updateOrderLocation(
-        orderId,
-        userInput,
-        OrderStatus.AWAITING_DELIVERY
-      );
+  //     await updateOrderLocation(
+  //       orderId,
+  //       userInput,
+  //       OrderStatus.AWAITING_DELIVERY
+  //     );
 
-      await bot.telegram.sendMessage(
-        chatId!, // Customer's Telegram chat ID
-        `How would you like to pay?`,
-        Markup.inlineKeyboard([
-          [
-            {
-              text: "🚚 Pay via delivery",
-              callback_data: `pay_delivery:${chatId}:${orderId}`,
-            },
-            {
-              text: "🏦 Pay via bank",
-              callback_data: `pay_bank:${chatId}:${orderId}`,
-            },
-          ],
-        ])
-      );
-    }
-  });
+  //     await bot.telegram.sendMessage(
+  //       chatId!, // Customer's Telegram chat ID
+  //       `How would you like to pay?`,
+  //       Markup.inlineKeyboard([
+  //         [
+  //           {
+  //             text: "🚚 Pay via delivery",
+  //             callback_data: `pay_delivery:${chatId}:${orderId}`,
+  //           },
+  //           {
+  //             text: "🏦 Pay via bank",
+  //             callback_data: `pay_bank:${chatId}:${orderId}`,
+  //           },
+  //         ],
+  //       ])
+  //     );
+  //   }
+  // });
 });
 
 // Helper function to validate phone number
