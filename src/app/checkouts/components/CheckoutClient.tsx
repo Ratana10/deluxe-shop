@@ -22,7 +22,8 @@ import { PaymentMethod } from "@/types/enums";
 const CheckoutClient = () => {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState<string>("default");
+  const [address, setAddress] = useState<string>("null");
+  const [location, setLocation] = useState<string>("null");
   const [expandedItems, setExpandedItems] = useState<string[]>([
     "order-summary",
   ]);
@@ -32,19 +33,6 @@ const CheckoutClient = () => {
   const { cart, clearCart, totalAmount, subtotalAmount, DELIVERY_FEE } =
     useCart();
   const { tg, queryId, chatId, showBackButton, hideBackButton } = useTelegram(); // Use your useTelegram hook
-
-  useEffect(() => {
-    if (tg) {
-      showBackButton();
-      tg.BackButton.onClick(() =>{
-        router.back();
-      })
-    }
-
-    return () => {
-      tg?.BackButton.hide();
-    };
-  }, [tg, router, showBackButton, hideBackButton]);
 
   const onMainButtonClick = useCallback(() => {
     console.log("Main button clicked");
@@ -59,8 +47,8 @@ const CheckoutClient = () => {
     const order: IOrder = {
       chatId,
       phoneNumber,
-      location: "null",
-      address: address,
+      location,
+      address,
       deliveryFee: DELIVERY_FEE,
       subtotal: subtotalAmount,
       total: totalAmount,
@@ -105,8 +93,22 @@ const CheckoutClient = () => {
     subtotalAmount,
     DELIVERY_FEE,
     paymentMethod,
-    isAgreed
+    isAgreed,
+    location,
   ]);
+
+  useEffect(() => {
+    if (tg) {
+      showBackButton();
+      tg.BackButton.onClick(() => {
+        router.back();
+      });
+    }
+
+    return () => {
+      tg?.BackButton.hide();
+    };
+  }, [tg, router, showBackButton, hideBackButton, isAgreed]);
 
   useEffect(() => {
     if (tg && phoneNumber && isAgreed) {
@@ -123,12 +125,12 @@ const CheckoutClient = () => {
         tg.MainButton.offClick(onMainButtonClick);
       };
     }
-  }, [tg, phoneNumber,  onMainButtonClick]);
+  }, [tg, phoneNumber, onMainButtonClick, isAgreed]);
 
   // Handle location selection from the map
-  const handleLocationSelect = (address: string) => {
-    console.log("address", address);
+  const handleLocationSelect = (address: string, locationLink: string) => {
     setAddress(address);
+    setLocation(locationLink);
   };
 
   // Handle accordion item expansion
@@ -238,20 +240,19 @@ const CheckoutClient = () => {
                     </h3>
                     <div className="mt-4 space-y-2 text-gray-600">
                       <p className="text-sm ">
-                        Account Name:{" "}
+                        Account Name:
                         <span className="font-bold text-customRedBrown">
-                          {" "}
                           SARANN CHAN MINEA
                         </span>
                       </p>
                       <p className="text-sm">
-                        Account Number:{" "}
+                        Account Number:
                         <span className="font-bold text-customRedBrown">
-                          1234567890{" "}
+                          1234567890
                         </span>
                       </p>
                       <p className="text-sm">
-                        Account Link:{" "}
+                        Account Link:
                         <a
                           href="https://pay.ababank.com/JC5nCa15DCHG4TXM8"
                           className="text-blue-500 underline"

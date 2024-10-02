@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  GoogleMap,
-  Marker,
-  useJsApiLoader,
-} from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { Markazi_Text } from "next/font/google";
 import { useRef, useState } from "react";
 
@@ -19,7 +15,7 @@ const center = {
 };
 
 interface Props {
-  onLocationSelect: (address: string) => void;
+  onLocationSelect: (address: string, locationLink: string) => void;
 }
 
 const Map = ({ onLocationSelect }: Props) => {
@@ -34,9 +30,6 @@ const Map = ({ onLocationSelect }: Props) => {
   } | null>(null);
 
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(
-    null
-  );
 
   const locationButtonAdded = useRef(false);
 
@@ -131,6 +124,10 @@ const Map = ({ onLocationSelect }: Props) => {
     }
   };
 
+  // Function to generate Google Maps location link
+  const generateLocationLink = (lat: number, lng: number) => {
+    return `https://www.google.com/maps?q=${lat},${lng}`;
+  };
 
   const handleMapClick = async (event: google.maps.MapMouseEvent) => {
     if (event.latLng) {
@@ -142,7 +139,7 @@ const Map = ({ onLocationSelect }: Props) => {
 
       const address = await fetchAddress(lat, lng);
       if (address) {
-        onLocationSelect(address);
+        onLocationSelect(address, generateLocationLink(lat, lng));
       }
     }
   };
@@ -157,7 +154,10 @@ const Map = ({ onLocationSelect }: Props) => {
 
           const address = await fetchAddress(latitude, longitude); // Fetch address for user's current location
           if (address) {
-            onLocationSelect(address); // Only pass the address to parent
+            onLocationSelect(
+              address,
+              generateLocationLink(latitude, longitude)
+            ); // Only pass the address to parent
           }
 
           setSelectedLocation(null); // Clear selected location when getting current location

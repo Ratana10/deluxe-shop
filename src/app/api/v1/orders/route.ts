@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       phoneNumber,
       orderStatus: OrderStatus.AWAITING_CONFIRM,
       paymentStatus: PaymentStatus.PENDING,
-      orderNumber, 
+      orderNumber,
       address,
       deliveryFee,
       paymentMethod,
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       .join("\n");
 
     // Seller message
-    const orderSuccess = "✅ Order Placed successfully"
+    const orderSuccess = "✅ Order Placed successfully";
     const customerMessage = dedent(
       `
       🧾 You have placed an order:
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       💳 Payment: ${paymentMethod}
       📅 Date : ${currentDate}
       📞 phone: ${phoneNumber}
-      📍 location: ${location}
+      📍 address: ${address}
         `
     );
 
@@ -117,7 +117,6 @@ export async function POST(req: NextRequest) {
       title: "Successfully",
       input_message_content: { message_text: orderSuccess },
     });
-
 
     const customerMsg = await bot.telegram.sendMessage(
       chatId!, // Customer's Telegram chat ID
@@ -132,10 +131,7 @@ export async function POST(req: NextRequest) {
       dedent(
         `
         Thank you for placing the orders.
-        We would love to inform you that 
-        it might take around a half day to 2 days 
-        for you to get the items.
-  
+        We would love to inform you that it might take around a half day to 2 days for you to get the items.
         If you have any problem, 
         Please kindly direct massage to the shop's owner
         `
@@ -144,7 +140,7 @@ export async function POST(req: NextRequest) {
 
     // console.log("customer message id", cusMsgId)
     // Update the saved order with customer message ID
-    savedOrder.cusMsgId = customerMsg.message_id
+    savedOrder.cusMsgId = customerMsg.message_id;
     savedOrder.save();
     // Send message to shop's ower
 
@@ -160,7 +156,8 @@ export async function POST(req: NextRequest) {
       💳 Payment: ${paymentMethod}
       📅 Date : ${currentDate}
       📞 phone: ${phoneNumber}
-      📍 location: ${location}
+      📍 address: ${address}
+      🧭 location: ${location}
       `
     );
 

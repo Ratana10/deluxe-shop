@@ -1,13 +1,13 @@
 import { Context } from "telegraf";
 import { PaymentMethod } from "./enums";
 
-export interface IOrderDetail{
+export interface IOrderDetail {
   productId: string;
   name: string;
   quantity: number;
   price: number;
 }
-export interface IOrder{
+export interface IOrder {
   chatId: number | null;
   queryId: string | null;
   orderNumber?: string;
