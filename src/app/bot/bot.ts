@@ -106,12 +106,6 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
     dedent(
       `
       Thank you for placing the orders.
-      We would love to inform you that 
-      it might take around a half day to 2 days 
-      for you to get the items.
-
-      If you have any problem, 
-      Please kindly direct massage to the shop's owner
       `
     )
   );

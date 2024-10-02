@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const formattedCartItems = order.orderDetails
       .map(
         (item: any) => `
-      - Item: ${item.name}
+      Item: ${item.name}
       Qty: ${item.quantity}
       Amount: $${item.price * item.quantity}
     `
@@ -99,9 +99,9 @@ export async function POST(req: NextRequest) {
       `
       🧾 You have placed an order:
       ${formattedCartItems}
-      🛵 Delivery: ${deliveryFee}
-      💰 Subtotal: ${subtotal}
-      💵 Total: $${total}
+      🛵 Delivery fee: ${deliveryFee.toFixed(2)}
+      💰 Subtotal: ${subtotal.toFixed(2)}
+      💵 Total: $${total.toFixed(2)}
       📦 Order: ${orderNumber}
       💳 Payment: ${paymentMethod}
       📅 Date : ${currentDate}
@@ -153,11 +153,11 @@ export async function POST(req: NextRequest) {
       `
       🚀 You have a new order:
       ${formattedCartItems}
-      🛵 Delivery: 
-      💰 Subtotal: 
-      💵 Total: $${order.total}
+      🛵 Delivery fee: ${deliveryFee.toFixed(2)}
+      💰 Subtotal: ${subtotal.toFixed(2)}
+      💵 Total: $${total.toFixed(2)}
       📦 Order: ${orderNumber}
-      💳 Payment: 
+      💳 Payment: ${paymentMethod}
       📅 Date : ${currentDate}
       📞 phone: ${phoneNumber}
       📍 location: ${location}

@@ -24,7 +24,7 @@ const PaymentClient = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("delivery"); // New state to track payment method
 
   const { cart, clearCart, totalAmount } = useCart();
-  const { tg, queryId, user, onClose, onToggleButton } = useTelegram(); // Use your useTelegram hook
+  const { tg, queryId } = useTelegram(); // Use your useTelegram hook
 
   // Memoize the onMainButtonClick function using useCallback
   const onMainButtonClick = useCallback(() => {

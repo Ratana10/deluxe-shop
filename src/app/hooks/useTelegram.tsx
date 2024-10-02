@@ -42,12 +42,31 @@ export const useTelegram = () => {
     tg?.close();
   }, [tg]);
 
+  const showBackButton = useCallback(() => {
+
+    if (tg?.BackButton) {
+      tg.BackButton.show();
+    }
+  }, [tg])
+
+  const hideBackButton = useCallback(() => {
+    if (tg?.BackButton) {
+      tg.BackButton.hide();
+    }
+  }, [tg]);
+
   // Function to toggle the visibility of the MainButton
-  const onToggleButton = useCallback(() => {
-    if (tg?.MainButton.isVisible) {
+  const showMainButton = useCallback((text: string, onClick: () => void) => {
+    if (tg?.MainButton) {
+      tg.MainButton.setText(text);
+      tg.MainButton.show();
+      tg.MainButton.onClick(onClick); 
+    }
+  }, [tg]);
+
+  const hideMainButton = useCallback(() => {
+    if (tg?.MainButton) {
       tg.MainButton.hide();
-    } else {
-      tg?.MainButton.show();
     }
   }, [tg]);
 
@@ -57,6 +76,9 @@ export const useTelegram = () => {
     user, // User details from the WebApp
     chatId, // User chat id
     onClose, // Function to close WebApp
-    onToggleButton, // Function to toggle MainButton
+    showBackButton,
+    hideBackButton,
+    showMainButton,
+    hideMainButton
   };
 };

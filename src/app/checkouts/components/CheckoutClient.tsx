@@ -23,28 +23,28 @@ const CheckoutClient = () => {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState<string>("default");
-  const [isPaid, setIsPaid] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([
     "order-summary",
-  ]); // State to track expanded items (string[])
-  const [paymentMethod, setPaymentMethod] = useState<string>("delivery"); // New state to track payment method
+  ]);
+  const [paymentMethod, setPaymentMethod] = useState<string>("delivery");
+  const [isAgreed, setIsAgreed] = useState(false);
 
   const { cart, clearCart, totalAmount, subtotalAmount, DELIVERY_FEE } =
     useCart();
-  const { tg, queryId, chatId } = useTelegram(); // Use your useTelegram hook
+  const { tg, queryId, chatId, showBackButton, hideBackButton } = useTelegram(); // Use your useTelegram hook
 
   useEffect(() => {
     if (tg) {
-      tg.BackButton.show();
-      tg.BackButton.onClick(() => {
+      showBackButton();
+      tg.BackButton.onClick(() =>{
         router.back();
-      });
+      })
     }
 
     return () => {
       tg?.BackButton.hide();
     };
-  }, [tg, router]);
+  }, [tg, router, showBackButton, hideBackButton]);
 
   const onMainButtonClick = useCallback(() => {
     console.log("Main button clicked");
@@ -89,15 +89,27 @@ const CheckoutClient = () => {
       }),
       {
         loading: "Loading ...",
-        success:
-          "Order Placed successfully",
+        success: "Order Placed successfully",
         error: "Order failed! Please try again.",
       }
     );
-  }, [phoneNumber, address, isPaid, totalAmount, chatId, queryId, cart, clearCart, totalAmount, subtotalAmount, DELIVERY_FEE, paymentMethod]);
+  }, [
+    phoneNumber,
+    address,
+    totalAmount,
+    chatId,
+    queryId,
+    cart,
+    clearCart,
+    totalAmount,
+    subtotalAmount,
+    DELIVERY_FEE,
+    paymentMethod,
+    isAgreed
+  ]);
 
   useEffect(() => {
-    if (tg && phoneNumber && isPaid) {
+    if (tg && phoneNumber && isAgreed) {
       console.log("Main button show");
 
       // Show tg main button
@@ -111,16 +123,12 @@ const CheckoutClient = () => {
         tg.MainButton.offClick(onMainButtonClick);
       };
     }
-  }, [tg, phoneNumber, isPaid, onMainButtonClick]);
+  }, [tg, phoneNumber,  onMainButtonClick]);
 
   // Handle location selection from the map
   const handleLocationSelect = (address: string) => {
     console.log("address", address);
     setAddress(address);
-  };
-
-  const handleCheckboxChange = () => {
-    setIsPaid(!isPaid);
   };
 
   // Handle accordion item expansion
@@ -131,9 +139,10 @@ const CheckoutClient = () => {
 
   const handlePaymentMethodChange = (method: string) => {
     setPaymentMethod(method);
-    if (method === "delivery") {
-      setIsPaid(false); // Reset the paid status if switching to delivery
-    }
+  };
+
+  const handleAgreeChange = () => {
+    setIsAgreed(!isAgreed); // Toggle agreement state
   };
 
   return (
@@ -209,7 +218,7 @@ const CheckoutClient = () => {
                 {paymentMethod === "qr" && (
                   <div className="mt-4">
                     <p className="text-sm mb-4 text-gray-600">
-                      Scan the QR Code to Pay:
+                      Here&apos;s our ABA QR
                     </p>
 
                     {/* QR Image */}
@@ -253,21 +262,6 @@ const CheckoutClient = () => {
                         </a>
                       </p>
                     </div>
-
-                    {/* Checkbox for payment confirmation */}
-                    <div className="flex items-center mt-4">
-                      <Checkbox
-                        id="paid"
-                        checked={isPaid}
-                        onCheckedChange={handleCheckboxChange}
-                      />
-                      <Label
-                        htmlFor="paid"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
-                      >
-                        I have already paid
-                      </Label>
-                    </div>
                   </div>
                 )}
               </div>
@@ -305,6 +299,21 @@ const CheckoutClient = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Checkbox for payment confirmation */}
+          <div className="flex items-center mt-4">
+            <Checkbox
+              id="agree"
+              checked={isAgreed}
+              onCheckedChange={handleAgreeChange}
+            />
+            <Label
+              htmlFor="agree"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
+            >
+              I agree
+            </Label>
+          </div>
         </Accordion>
       </div>
     </div>
