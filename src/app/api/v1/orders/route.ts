@@ -4,7 +4,7 @@ import { Markup } from "telegraf";
 import Counter from "@/models/Counter";
 import Order from "@/models/Order";
 import { OrderStatus, PaymentStatus } from "@/types/enums";
-import { OrderDetail as IOrderDetail } from "@/types";
+import { IOrder, OrderDetail as IOrderDetail } from "@/types";
 import OrderDetail from "@/models/OrderDetail";
 import bot from "@/app/bot/bot";
 import { format } from "date-fns";
@@ -13,7 +13,18 @@ import dedent from "dedent";
 export async function POST(req: NextRequest) {
   try {
     const order = await req.json();
-    const { total, address, phoneNumber, orderDetails, queryId } = order;
+    const {
+      total,
+      location,
+      phoneNumber,
+      orderDetails,
+      queryId,
+      chatId,
+      address,
+      deliveryFee,
+      paymentMethod,
+      subtotal,
+    }: IOrder = order;
 
     console.log("order", order);
 
@@ -31,13 +42,17 @@ export async function POST(req: NextRequest) {
     const orderNumber = `DELUXE${yearMonth}${String(seq).padStart(4, "0")}`; // e.g., DELUXE202409000
 
     const orderModel = new Order({
-      chatId: 123,
+      chatId,
       total,
-      location: address,
+      location,
       phoneNumber,
       orderStatus: OrderStatus.AWAITING_CONFIRM,
       paymentStatus: PaymentStatus.PENDING,
-      orderNumber,
+      orderNumber, 
+      address,
+      deliveryFee,
+      paymentMethod,
+      subtotal,
     });
 
     console.log("orderModel", orderModel);
@@ -81,11 +96,16 @@ export async function POST(req: NextRequest) {
     // Seller message
     const customerMessage = dedent(
       `
-      ✨ You have placed an order:
+      🧾 You have placed an order:
       ${formattedCartItems}
-      💵 Total: $${order.total}
+      🛵 Delivery: ${deliveryFee}
+      💰 Subtotal: ${subtotal}
+      💵 Total: $${total}
       📦 Order: ${orderNumber}
+      💳 Payment: ${paymentMethod}
       📅 Date : ${currentDate}
+      📞 phone: ${phoneNumber}
+      📍 location: ${location}
         `
     );
 
@@ -95,34 +115,42 @@ export async function POST(req: NextRequest) {
       [{ text: "🟡 Pending", callback_data: "no_action" }],
     ]);
 
-    await bot.telegram.answerWebAppQuery(queryId, {
+    await bot.telegram.answerWebAppQuery(queryId!, {
       type: "article",
-      id: queryId,
+      id: queryId!,
       title: "Successfully",
       input_message_content: { message_text: customerMessage },
       reply_markup: {
         inline_keyboard: inlineKeyboard.reply_markup.inline_keyboard,
       },
     });
+    // console.log("customer message id", cusMsgId)
+    // Update the saved order with customer message ID
+    // savedOrder.cusMsgId = cusMsgId
 
+    savedOrder.save();
     // Send message to shop's ower
 
     // Seller message
     const sellerMessage = dedent(
       `
-          ✨ You have a new order:
-          ${formattedCartItems}
-          💵 Total: $${total}
-          📦 Order: ${orderNumber}
-          📅 Date : ${currentDate}
-          location: ${address}
-          payment: paid
-    
-          👤 UserDetail
-          `
+      🚀 You have a new order:
+      ${formattedCartItems}
+      🛵 Delivery: 
+      💰 Subtotal: 
+      💵 Total: $${order.total}
+      📦 Order: ${orderNumber}
+      💳 Payment: 
+      📅 Date : ${currentDate}
+      📞 phone: ${phoneNumber}
+      📍 location: ${location}
+      `
     );
 
-    await bot.telegram.sendMessage( process.env.TELEGRAM_CHAT_ID!, sellerMessage)
+    await bot.telegram.sendMessage(
+      process.env.TELEGRAM_CHAT_ID!,
+      sellerMessage
+    );
 
     return NextResponse.json({ message: "Order created successfully" });
   } catch (error) {

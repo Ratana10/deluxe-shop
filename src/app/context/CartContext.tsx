@@ -11,6 +11,8 @@ import {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const DELIVERY_FEE = 2;
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -67,16 +69,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     0
   );
 
-  const totalAmount = cart.reduce(
+  const subtotalAmount = cart.reduce(
     (t: number, item: CartItem) => t + item.quantity * item.price,
     0
   );
+
+  // Total amount including the delivery fee
+  const totalAmount = subtotalAmount + DELIVERY_FEE;
 
   return (
     <CartContext.Provider
       value={{
         totalQuantity,
         totalAmount,
+        subtotalAmount,
+        DELIVERY_FEE,
         cart,
         addToCart,
         removeFromCart,

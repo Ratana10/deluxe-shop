@@ -1,4 +1,25 @@
 import { Context } from "telegraf";
+import { PaymentMethod } from "./enums";
+
+export interface IOrderDetail{
+  productId: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+export interface IOrder{
+  chatId: number | null;
+  queryId: string | null;
+  orderNumber?: string;
+  phoneNumber: string;
+  location: string;
+  address: string;
+  deliveryFee: number;
+  subtotal: number;
+  total: number;
+  orderDetails: IOrderDetail[];
+  paymentMethod: PaymentMethod;
+}
 
 export interface Customer {
   chatId: number;
@@ -51,6 +72,8 @@ export interface CartItem {
 export interface CartContextType {
   totalQuantity: number;
   totalAmount: number;
+  subtotalAmount: number;
+  DELIVERY_FEE: number;
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;

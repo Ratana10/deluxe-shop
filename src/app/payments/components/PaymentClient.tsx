@@ -21,6 +21,7 @@ const PaymentClient = () => {
   const [address, setAddress] = useState<string>("default");
   const [isPaid, setIsPaid] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([""]); // State to track expanded items (string[])
+  const [paymentMethod, setPaymentMethod] = useState<string>("delivery"); // New state to track payment method
 
   const { cart, clearCart, totalAmount } = useCart();
   const { tg, queryId, user, onClose, onToggleButton } = useTelegram(); // Use your useTelegram hook
@@ -103,6 +104,13 @@ const PaymentClient = () => {
     setExpandedItems(newItems);
   };
 
+  const handlePaymentMethodChange = (method: string) => {
+    setPaymentMethod(method);
+    if (method === "delivery") {
+      setIsPaid(false); // Reset the paid status if switching to delivery
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-center my-4">Information</h1>
@@ -136,43 +144,87 @@ const PaymentClient = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* Accordion Item for QR Code and Checkbox */}
-          <AccordionItem value="qr-code">
-            <AccordionTrigger>Payment QR Code</AccordionTrigger>
+          {/* Accordion Item for Payment Method */}
+          <AccordionItem value="payment-method">
+            <AccordionTrigger>Select Payment Method</AccordionTrigger>
             <AccordionContent>
-              <div className="mt-1">
-                <p className="text-sm mb-4 text-gray-600">
-                  Scan the QR Code to Pay:
-                </p>
+              <div className="mt-2">
+                <Label className="text-lg">Choose Payment Method</Label>
 
-                {/* QR Image */}
-                <div className="flex justify-center mb-4">
-                  <Image
-                    src="/img/aba_qr.jpg" // Replace with your actual QR code image path
-                    alt="QR Code"
-                    width={256}
-                    height={256}
-                    className="block"
-                  />
-                </div>
+                <div className="flex space-x-4 mt-4">
+                  {/* Cash on Delivery Payment Option */}
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="delivery"
+                      name="paymentMethod"
+                      value="delivery"
+                      checked={paymentMethod === "delivery"}
+                      onChange={() => handlePaymentMethodChange("delivery")}
+                    />
+                    <Label htmlFor="delivery" className="ml-2">
+                      Cash on Delivery
+                    </Label>
+                  </div>
 
-                {/* Checkbox for payment confirmation */}
-                <div className="flex items-center mt-4">
-                  <Checkbox
-                    id="paid"
-                    checked={isPaid}
-                    onCheckedChange={handleCheckboxChange}
-                  />
-                  <Label
-                    htmlFor="paid"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
-                  >
-                    I have already paid
-                  </Label>
+                  {/* QR Code Payment Option */}
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="qr"
+                      name="paymentMethod"
+                      value="qr"
+                      checked={paymentMethod === "qr"}
+                      onChange={() => handlePaymentMethodChange("qr")}
+                    />
+                    <Label htmlFor="qr" className="ml-2">
+                      Pay via QR Code
+                    </Label>
+                  </div>
                 </div>
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Conditionally Render Payment Information */}
+          {paymentMethod === "qr" && (
+            <AccordionItem value="qr-code">
+              <AccordionTrigger>Payment QR Code</AccordionTrigger>
+              <AccordionContent>
+                <div className="mt-1">
+                  <p className="text-sm mb-4 text-gray-600">
+                    Scan the QR Code to Pay:
+                  </p>
+
+                  {/* QR Image */}
+                  <div className="flex justify-center mb-4">
+                    <Image
+                      src="/img/aba_qr.jpg" // Replace with your actual QR code image path
+                      alt="QR Code"
+                      width={256}
+                      height={256}
+                      className="block"
+                    />
+                  </div>
+
+                  {/* Checkbox for payment confirmation */}
+                  <div className="flex items-center mt-4">
+                    <Checkbox
+                      id="paid"
+                      checked={isPaid}
+                      onCheckedChange={handleCheckboxChange}
+                    />
+                    <Label
+                      htmlFor="paid"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
+                    >
+                      I have already paid
+                    </Label>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
         </Accordion>
       </div>
     </div>

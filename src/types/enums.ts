@@ -13,3 +13,8 @@ export enum OrderStatus {
   COMPLETED = "Completed",  // Customer received the product ordered
   REJECTED = "Rejected", // Ower rejected the the product ordered
 }
+
+export enum PaymentMethod{
+  DELIVERY = "Delivery",
+  BANK = "Bank"
+}

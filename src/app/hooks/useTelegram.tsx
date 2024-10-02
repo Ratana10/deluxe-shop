@@ -22,6 +22,7 @@ export const getWebApp = (): WebApp | null => {
 export const useTelegram = () => {
   const [tg, setTg] = useState<WebApp | null>(null);
   const [queryId, setQueryId] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export const useTelegram = () => {
     if (telegramApp) {
       setTg(telegramApp);
       setQueryId(telegramApp.initDataUnsafe?.query_id || null);
+      setChatId(telegramApp.initDataUnsafe?.user?.id || null);
       setUser(telegramApp.initDataUnsafe?.user || null);
       telegramApp.ready(); // Mark the WebApp as ready
     }
@@ -53,6 +55,7 @@ export const useTelegram = () => {
     tg, // Telegram WebApp instance
     queryId, // Query ID from the WebApp
     user, // User details from the WebApp
+    chatId, // User chat id
     onClose, // Function to close WebApp
     onToggleButton, // Function to toggle MainButton
   };

@@ -22,8 +22,6 @@ import Link from "next/link";
 const CartSheet = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const router = useRouter();
-
   const {
     totalQuantity,
     totalAmount,
@@ -159,6 +157,14 @@ const CartSheet = () => {
               </ul>
             )}
 
+            {/* Delivery Price */}
+            <div className="mt-6 border-t pt-4">
+              <div className="flex justify-between items-center text-lg font-semibold">
+                <span>Delivery</span>
+                <span>$ 2.00</span>{" "}
+              </div>
+            </div>
+
             {/* Total Price */}
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between items-center text-lg font-semibold">
@@ -169,7 +175,7 @@ const CartSheet = () => {
           </div>
           <SheetFooter className="">
             <SheetClose asChild>
-              <Link href="/payments">
+              <Link href="/checkouts">
                 <button
                   className={`btn-primary w-full mt-3`}
                   disabled={cart.length === 0}
