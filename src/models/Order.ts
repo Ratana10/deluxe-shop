@@ -6,6 +6,7 @@ interface OrderDocument extends Document {
   orderNumber: string;
   cusMsgId: number;
   orderStatus: IOrderStatus;
+  reason: string;
   deliveryFee: number;
   subtotal: number;
   total: number;
@@ -30,6 +31,7 @@ const OrderSchema: Schema = new Schema(
       enum: Object.values(IOrderStatus),
       default: IOrderStatus.PENDING,
     },
+    reason: { type: String, required: false},
     paymentStatus: {
       type: String,
       enum: Object.values(IPaymentStatus),

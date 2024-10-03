@@ -2,7 +2,12 @@ import { connectMongoDB } from "@/lib/mongodb";
 import Counter from "@/models/Counter";
 import Order from "@/models/Order";
 import { CartItem } from "@/types";
-import { OrderStatus, PaymentStatus } from "@/types/enums";
+import {
+  IOrderStatus,
+  IPaymentStatus,
+  OrderStatus,
+  PaymentStatus,
+} from "@/types/enums";
 import OrderDetail from "@/models/OrderDetail";
 
 // Create new order
@@ -87,7 +92,7 @@ export async function updateCustomerMessageId(
 // Update ordered phone number
 export async function updateOrderStatus(
   orderId: string,
-  orderStatus: OrderStatus
+  orderStatus: IOrderStatus
 ) {
   await connectMongoDB();
 
@@ -100,50 +105,7 @@ export async function updateOrderStatus(
   if (!updatedOrder) {
     throw new Error("Order not found");
   }
-
-  return updatedOrder;
-}
-
-// Update ordered phone number
-export async function updateOrderPhoneNumber(
-  orderId: string,
-  phoneNumber: string,
-  orderStatus: OrderStatus
-) {
-  await connectMongoDB();
-
-  const updatedOrder = await Order.findByIdAndUpdate(
-    orderId,
-    { phoneNumber: phoneNumber, orderStatus: orderStatus },
-    { new: true }
-  );
-
-  if (!updatedOrder) {
-    throw new Error("Order not found");
-  }
-
-  return updatedOrder;
-}
-
-// Update ordered location
-export async function updateOrderLocation(
-  orderId: string,
-  location: string,
-  orderStatus: OrderStatus
-) {
-  await connectMongoDB();
-
-  const updatedOrder = await Order.findByIdAndUpdate(
-    orderId,
-    { location: location, orderStatus: orderStatus },
-    { new: true }
-  );
-
-  if (!updatedOrder) {
-    throw new Error("Order not found");
-  }
-
-  return updatedOrder;
+  
 }
 
 // Get ordered by ChatId
@@ -184,3 +146,16 @@ export async function updateOrderPaymentStatus(
 
   return updatedOrder;
 }
+
+export const updateRejectedReason = async (orderId: string, reason: string) => {
+  await connectMongoDB();
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { reason: reason, orderStatus: IOrderStatus.REJECT },
+    { new: true }
+  );
+
+  if (!updatedOrder) {
+    throw new Error("Order not found");
+  }
+};

@@ -1,13 +1,12 @@
 import { Context, Markup, session, Telegraf } from "telegraf";
 import dotenv from "dotenv";
-import { OrderStatus, PaymentStatus } from "@/types/enums";
+import { IOrderStatus, OrderStatus, PaymentStatus } from "@/types/enums";
 import dedent from "dedent";
 import {
   getOrderById,
-  updateOrderLocation,
   updateOrderPaymentStatus,
-  updateOrderPhoneNumber,
   updateOrderStatus,
+  updateRejectedReason,
 } from "@/service/db/order.service";
 import { createUser } from "@/service/db/user.service";
 
@@ -71,12 +70,11 @@ bot.start(async (ctx) => {
     `Hello ${
       telegrafUser.first_name || "there"
     }! ⭐\nReady to place an order!!`,
-    Markup.inlineKeyboard([[Markup.button.url("Start Order website", webUrl)]])
+    Markup.inlineKeyboard([[Markup.button.url("Start Order", webUrl)]])
   );
 });
 
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
-  // await handleConfirmOrder(ctx);
   const [chatId, orderId] = ctx.match.slice(1);
 
   await ctx.answerCbQuery();
@@ -110,78 +108,12 @@ bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
     )
   );
 
-  //Update Order Status
-  let order = await updateOrderStatus(orderId, OrderStatus.AWAITING_PHONE);
-
-  // // Ask the user to type their phone number
-  // await bot.telegram.sendMessage(
-  //   chatId,
-  //   `Please type your phone number example: 096888888`
-  // );
-
-  // // Setup listener
-  // bot.on("text", async (ctx) => {
-  //   const chatId = String(ctx.message.chat.id);
-  //   const userInput = ctx.message?.text;
-
-  //   if (!userInput) {
-  //     return;
-  //   }
-
-  //   // Get order
-  //   order = await getOrderById(orderId);
-
-  //   if (order.orderStatus === OrderStatus.AWAITING_PHONE) {
-  //     if (validatePhoneNumber(userInput)) {
-  //       await ctx.reply(`Thank you! Your phone number has been recorded.`);
-  //       await updateOrderPhoneNumber(
-  //         orderId,
-  //         userInput,
-  //         OrderStatus.AWAITING_LOCATION
-  //       );
-  //       await ctx.reply(`Please type in your location for delivery.`);
-  //     } else {
-  //       // Wrong phone number format
-  //       await ctx.reply(
-  //         `The phone number you entered is invalid. Please try again.`
-  //       );
-  //     }
-  //   } else if (order.orderStatus === OrderStatus.AWAITING_LOCATION) {
-  //     await ctx.reply(
-  //       `Thank you! Your delivery location has been set to ${userInput}.`
-  //     );
-
-  //     await updateOrderLocation(
-  //       orderId,
-  //       userInput,
-  //       OrderStatus.AWAITING_DELIVERY
-  //     );
-
-  //     await bot.telegram.sendMessage(
-  //       chatId!, // Customer's Telegram chat ID
-  //       `How would you like to pay?`,
-  //       Markup.inlineKeyboard([
-  //         [
-  //           {
-  //             text: "🚚 Pay via delivery",
-  //             callback_data: `pay_delivery:${chatId}:${orderId}`,
-  //           },
-  //           {
-  //             text: "🏦 Pay via bank",
-  //             callback_data: `pay_bank:${chatId}:${orderId}`,
-  //           },
-  //         ],
-  //       ])
-  //     );
-  //   }
-  // });
+  // Update confirm order
+  await updateOrderStatus(orderId, IOrderStatus.CONFIRM);
 });
 
-// Helper function to validate phone number
-function validatePhoneNumber(phoneNumber: string) {
-  const phoneRegex = /^\+?[0-9]{10,15}$/;
-  return phoneRegex.test(phoneNumber);
-}
+
+const pendingRejections = new Map();
 
 bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
@@ -195,48 +127,44 @@ bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   // notify ower write the rejected reason
   await ctx.reply("Please provide a reason for rejecting the order");
 
-  // bot.on("")
+  // Save chatId and orderId in pendingRejections for this user
+  pendingRejections.set(ctx.from.id, { chatId, orderId });
+});
 
-  const { cusMsgId } = await getOrderById(orderId);
+bot.on("text", async (ctx) => {
+  // Check if this user has a pending rejection reason
+  const rejectionInfo = pendingRejections.get(ctx.from.id);
+  if (rejectionInfo) {
+    const { chatId, orderId } = rejectionInfo;
+    const rejectionReason = ctx.message.text;
 
-  if (!cusMsgId) {
-    console.error("cusMsgId", cusMsgId, orderId);
-    throw new Error("cusMsgId id not found");
+    // Remove the pending rejection, so further text inputs don't get linked to this
+    pendingRejections.delete(ctx.from.id);
+
+    const { cusMsgId } = await getOrderById(orderId);
+    if (!cusMsgId) {
+      console.error("cusMsgId", cusMsgId, orderId);
+      throw new Error("cusMsgId id not found");
+    }
+
+    // Update the customer's order status in their message
+    await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
+      inline_keyboard: [[{ text: "🔴 Rejected", callback_data: "no_action" }]],
+    });
+
+    // Notify the customer of the rejection and the reason
+    await bot.telegram.sendMessage(
+      chatId,
+      `Your order has been rejected by the shop's owner.\nReason: ${rejectionReason}`
+    );
+
+    await updateRejectedReason(orderId, rejectionReason);
+    await ctx.reply(
+      "Rejection reason recorded and customer has been notified."
+    );
   }
-
-  //update customer chat Pending to Rejected
-  await bot.telegram.editMessageReplyMarkup(chatId, cusMsgId, undefined, {
-    inline_keyboard: [[{ text: "🔴 Rejected", callback_data: "no_action" }]],
-  });
-
-  await bot.telegram.sendMessage(
-    chatId,
-    "Your order has been rejected by the shop's owner! ❌"
-  );
-
-  //Update Order Status
-  await updateOrderStatus(orderId, OrderStatus.REJECTED);
 });
 
-bot.action(/pay_delivery:(.+):(.+)/, async (ctx) => {
-  const [chatId, orderId] = ctx.match.slice(1);
-
-  await updateOrderStatus(orderId, OrderStatus.AWAITING_DELIVERY);
-
-  await ctx.reply(
-    dedent(
-      `
-      Thank you for placing the orders.
-      We would love to inform you that 
-      it might take around a half day to 2 days 
-      for you to get the items.
-
-      If you have any problem, 
-      Please kindly direct massage to the shop's owner
-      `
-    )
-  );
-});
 
 bot.action(/pay_bank:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);

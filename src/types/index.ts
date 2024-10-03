@@ -12,6 +12,7 @@ export interface IOrder {
   chatId: number | null;
   orderNumber?: string;
   orderStatus?: IOrderStatus;
+  reason?: string;
   paymentStatus?: IPaymentStatus;
   paymentMethod: PaymentMethod;
   deliveryFee: number;

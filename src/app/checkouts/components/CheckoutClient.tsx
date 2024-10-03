@@ -43,7 +43,7 @@ const CheckoutClient = () => {
       quantity: item.quantity,
       price: item.price,
     }));
-    
+
     const order: IOrder = {
       chatId,
       queryId,
@@ -59,7 +59,7 @@ const CheckoutClient = () => {
       phoneNumber,
       location,
       address,
-      orderDetails
+      orderDetails,
     };
 
     toast.promise(
@@ -150,21 +150,26 @@ const CheckoutClient = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-center my-4">Checkout</h1>
-      <div className="space-y-4">
+      <h1 className="text-3xl font-bold text-center my-4 text-[#660404]">
+        Checkout
+      </h1>
+      <div className="space-y-6 p-6 rounded-lg ">
         {/* Phone Input */}
         <div>
-          <Label htmlFor="phone">Phone</Label>
+          <Label htmlFor="phone" className="text-[#660404]">
+            Phone Number
+          </Label>
           <Input
             type="tel"
             id="phone"
-            placeholder="Enter your phone"
+            placeholder="Enter your phone number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            className="border-gray-300 focus:border-[#660404] focus:ring-[#660404]"
           />
         </div>
 
-        {/* Accordion for Map and QR Code */}
+        {/* Accordion for Address and Payment */}
         <Accordion
           type="multiple"
           value={expandedItems}
@@ -173,7 +178,9 @@ const CheckoutClient = () => {
         >
           {/* Accordion Item for Map */}
           <AccordionItem value="location">
-            <AccordionTrigger>Delivery Address</AccordionTrigger>
+            <AccordionTrigger className="text-[#660404] hover:underline">
+              Delivery Address
+            </AccordionTrigger>
             <AccordionContent>
               <div className="mt-2">
                 <Map onLocationSelect={handleLocationSelect} />
@@ -183,7 +190,9 @@ const CheckoutClient = () => {
 
           {/* Accordion Item for Payment Method */}
           <AccordionItem value="payment-method">
-            <AccordionTrigger>Payment Method</AccordionTrigger>
+            <AccordionTrigger className="text-[#660404] hover:underline">
+              Payment Method
+            </AccordionTrigger>
             <AccordionContent>
               <div className="mt-2">
                 <div className="flex space-x-4 mt-4">
@@ -197,7 +206,7 @@ const CheckoutClient = () => {
                       checked={paymentMethod === "delivery"}
                       onChange={() => handlePaymentMethodChange("delivery")}
                     />
-                    <Label htmlFor="delivery" className="ml-2">
+                    <Label htmlFor="delivery" className="ml-2 text-gray-700">
                       Cash on Delivery
                     </Label>
                   </div>
@@ -212,19 +221,17 @@ const CheckoutClient = () => {
                       checked={paymentMethod === "qr"}
                       onChange={() => handlePaymentMethodChange("qr")}
                     />
-                    <Label htmlFor="qr" className="ml-2">
+                    <Label htmlFor="qr" className="ml-2 text-gray-700">
                       Pay via QR Code
                     </Label>
                   </div>
                 </div>
-                {/* Conditionally Render Payment QR Code (Directly without AccordionItem) */}
-                {paymentMethod === "qr" && (
-                  <div className="mt-4">
-                    <p className="text-sm mb-4 text-gray-600">
-                      Here&apos;s our ABA QR
-                    </p>
 
-                    {/* QR Image */}
+                {paymentMethod === "qr" && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm mb-4 text-gray-600">
+                      Scan the QR Code to pay:
+                    </p>
                     <div className="flex justify-center mb-4">
                       <Image
                         src="/img/aba_qr.jpg" // Replace with your actual QR code image path
@@ -234,34 +241,31 @@ const CheckoutClient = () => {
                         className="block"
                       />
                     </div>
-
-                    {/* Account Detail */}
-                    <h3 className="font-bold text-lg md:text-xl text-center">
-                      Total ${totalAmount.toFixed(2)}
+                    <h3 className="font-bold text-lg md:text-xl text-center text-gray-800">
+                      Total: ${totalAmount.toFixed(2)}
                     </h3>
-                    <div className="mt-4 space-y-2 text-gray-600">
-                      <p className="text-sm ">
-                        Account Name:
-                        <span className="font-bold text-customRedBrown">
-                          SARANN CHAN MINEA
-                        </span>
+                    <div className="mt-4 space-y-2 ">
+                      <p className="text-sm">
+                        Account Name: {" "}
+                        <span className="text-[#660404] font-semibold">SARANN CHAN MINEA</span>
                       </p>
                       <p className="text-sm">
-                        Account Number:
-                        <span className="font-bold text-customRedBrown">
-                          1234567890
-                        </span>
+                        Account Number: {" "}
+                        <span className="text-[#660404] font-semibold">1234567890</span>
                       </p>
                       <p className="text-sm">
                         Account Link:
-                        <a
-                          href="https://pay.ababank.com/JC5nCa15DCHG4TXM8"
-                          className="text-blue-500 underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          ABA payment link
-                        </a>
+                        <span className="text-[#660404] font-semibold">
+                          {" "}
+                          <a
+                            href="https://pay.ababank.com/JC5nCa15DCHG4TXM8" // Replace with your actual account link
+                            className="text-blue-500 underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            ABA payment link
+                          </a>
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -272,14 +276,16 @@ const CheckoutClient = () => {
 
           {/* Accordion Item for Order Summary */}
           <AccordionItem value="order-summary">
-            <AccordionTrigger>Order Summary</AccordionTrigger>
+            <AccordionTrigger className="text-[#660404] hover:underline">
+              Order Summary
+            </AccordionTrigger>
             <AccordionContent>
               <div className="mt-2">
                 <ul>
                   {cart.map((item) => (
                     <li key={item.id} className="flex justify-between mb-4">
                       <span>
-                        {item.name} {"  "} x {item.quantity}
+                        {item.name} x {item.quantity}
                       </span>
                       <span>${item.price * item.quantity}</span>
                     </li>
@@ -287,33 +293,34 @@ const CheckoutClient = () => {
                 </ul>
                 <div className="border-t my-4" />
                 <div className="flex justify-between mb-4">
-                  <p>Subtotal</p>
-                  <span>$ {subtotalAmount.toFixed(2)}</span>
+                  <p className="text-gray-700">Subtotal</p>
+                  <span>${subtotalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between mb-4">
-                  <p>Delivery</p>
-                  <span>$ {DELIVERY_FEE.toFixed(2)}</span>
+                  <p className="text-gray-700">Delivery</p>
+                  <span>${DELIVERY_FEE.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between mb-4">
+                <div className="flex justify-between mb-4 font-bold">
                   <p>Total</p>
-                  <span>$ {totalAmount.toFixed(2)}</span>
+                  <span>${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Checkbox for payment confirmation */}
+          {/* Checkbox for Terms and Conditions */}
           <div className="flex items-center mt-4">
             <Checkbox
               id="agree"
               checked={isAgreed}
               onCheckedChange={handleAgreeChange}
+              className="mr-2"
             />
             <Label
               htmlFor="agree"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
+              className="text-sm font-medium leading-none text-gray-700"
             >
-              I agree
+              I agree to the terms and conditions
             </Label>
           </div>
         </Accordion>
