@@ -1,16 +1,18 @@
 import { connectMongoDB } from "@/lib/mongodb";
 import User from "@/models/User";
-import { Customer } from "@/types";
+import { Customer, IUser } from "@/types";
 
 // Create user
-export async function createUser(customer: Customer) {
-  if (!customer) {
+export async function createUser(user: IUser) {
+  if (!user) {
     return;
   }
 
+  const { chatId, firstName, lastName, username } = user;
+
   await connectMongoDB();
 
-  const existingUser = await User.findOne({ chatId: customer.chatId });
+  const existingUser = await User.findOne({ chatId });
 
   if (existingUser) {
     existingUser.botUsed = existingUser.botUsed + 1;
@@ -18,35 +20,13 @@ export async function createUser(customer: Customer) {
     return;
   }
 
-  console.log("Create user", customer);
-
   const newUser = new User({
-    chatId: customer.chatId,
-    username: customer.username,
-    firstName: customer.firstName,
-    lastName: customer.lastName,
-    botUsed: 1,
-    phoneNumber: "",
+    chatId: chatId,
+    username: username,
+    firstName: firstName,
+    lastName: lastName,
   });
 
-  const user = await newUser.save();
-  console.log("test user", user);
-}
-export async function updateUserPhoneNumber(
-  chatId: number,
-  phoneNumber: string
-) {
-  await connectMongoDB();
-
-  const updatedUser = await User.findOneAndUpdate(
-    { chatId: chatId },
-    { phoneNumber: phoneNumber },
-    { new: true }
-  );
-
-  if (!updatedUser) {
-    throw new Error("User not found");
-  }
-
-  return updatedUser;
+  const savedUser = await newUser.save();
+  console.log("test user", savedUser);
 }

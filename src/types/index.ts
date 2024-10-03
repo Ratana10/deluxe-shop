@@ -33,7 +33,7 @@ export interface IUser {
   lastName?: string;
   chatId: number;
   phoneNumber?: string;
-  botUsed: number;
+  botUsed?: number;
 }
 
 export interface Customer {
