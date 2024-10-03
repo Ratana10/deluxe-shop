@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { Markup } from "telegraf";
 import Counter from "@/models/Counter";
 import Order from "@/models/Order";
-import { OrderStatus, PaymentStatus } from "@/types/enums";
 import { IOrder, OrderDetail as IOrderDetail } from "@/types";
 import OrderDetail from "@/models/OrderDetail";
 import bot from "@/app/bot/bot";
@@ -14,16 +13,18 @@ export async function POST(req: NextRequest) {
   try {
     const order = await req.json();
     const {
-      total,
-      location,
-      phoneNumber,
-      orderDetails,
-      queryId,
       chatId,
-      address,
-      deliveryFee,
+      queryId,
+      orderStatus,
+      paymentStatus,
       paymentMethod,
+      deliveryFee,
       subtotal,
+      total,
+      phoneNumber,
+      location,
+      address,
+      orderDetails,
     }: IOrder = order;
 
     console.log("order", order);
@@ -43,21 +44,24 @@ export async function POST(req: NextRequest) {
 
     const orderModel = new Order({
       chatId,
-      total,
-      location,
-      phoneNumber,
-      orderStatus: OrderStatus.AWAITING_CONFIRM,
-      paymentStatus: PaymentStatus.PENDING,
       orderNumber,
-      address,
-      deliveryFee,
+      orderStatus,
+      paymentStatus,
       paymentMethod,
+      deliveryFee,
       subtotal,
+      total,
+      phoneNumber,
+      location,
+      address,
+      orderDetails: [],
     });
 
     console.log("orderModel", orderModel);
 
     const savedOrder = await orderModel.save();
+    if (!savedOrder) throw new Error("Failed to save the order.");
+    console.log("savedOrder", savedOrder);
 
     // Create OrderDetail
     const orderDetailsData = orderDetails.map((item: IOrderDetail) => ({
@@ -68,28 +72,27 @@ export async function POST(req: NextRequest) {
       price: item.price,
     }));
 
-    console.log("Order Details Prepared:", orderDetailsData);
-
     //Insert the orderdetails into the db
     const createdOrderDetails = await OrderDetail.insertMany(orderDetailsData);
+    if (!createdOrderDetails) throw new Error("Failed to save order details.");
 
     //Link the created order detail ids to the main order
     savedOrder.orderDetails = createdOrderDetails.map((detail) => detail._id);
 
     await savedOrder.save();
-
-    console.log("Order and Order Details saved successfully");
+    if (!savedOrder) throw new Error("Failed to save order link to order.");
 
     // Send message to telegram
     const currentDate = format(new Date(), "MM-dd-yyyy hh:mm:ss a");
 
-    const formattedCartItems = order.orderDetails
+    const formattedCartItems = orderDetails
       .map(
-        (item: any) => `
+        (item: any) =>
+          `
       Item: ${item.name}
       Qty: ${item.quantity}
       Amount: $${item.price * item.quantity}
-    `
+      `
       )
       .join("\n");
 
@@ -119,7 +122,7 @@ export async function POST(req: NextRequest) {
     });
 
     const customerMsg = await bot.telegram.sendMessage(
-      chatId!, // Customer's Telegram chat ID
+      chatId!,
       customerMessage,
       Markup.inlineKeyboard([
         [{ text: "🟡 Order Pending", callback_data: "no_action" }],

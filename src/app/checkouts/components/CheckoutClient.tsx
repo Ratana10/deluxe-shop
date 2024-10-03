@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import { useTelegram } from "@/app/hooks/useTelegram";
 import { useRouter } from "next/navigation";
 import { IOrder } from "@/types";
-import { PaymentMethod } from "@/types/enums";
+import { IOrderStatus, IPaymentStatus, PaymentMethod } from "@/types/enums";
 
 const CheckoutClient = () => {
   const router = useRouter();
@@ -43,23 +43,24 @@ const CheckoutClient = () => {
       quantity: item.quantity,
       price: item.price,
     }));
-
+    
     const order: IOrder = {
       chatId,
-      phoneNumber,
-      location,
-      address,
+      queryId,
+      orderStatus: IOrderStatus.PENDING,
+      paymentStatus: IPaymentStatus.PENDING,
+      paymentMethod:
+        paymentMethod === "delivery"
+          ? PaymentMethod.DELIVERY
+          : PaymentMethod.BANK,
       deliveryFee: DELIVERY_FEE,
       subtotal: subtotalAmount,
       total: totalAmount,
-      queryId,
-      orderDetails,
-      paymentMethod:
-        paymentMethod === PaymentMethod.BANK
-          ? PaymentMethod.BANK
-          : PaymentMethod.DELIVERY,
+      phoneNumber,
+      location,
+      address,
+      orderDetails
     };
-    console.table(order);
 
     toast.promise(
       fetch("/api/v1/orders", {

@@ -1,18 +1,17 @@
-import { OrderStatus, PaymentMethod, PaymentStatus } from "@/types/enums";
+import { IOrderStatus, IPaymentMethod, IPaymentStatus } from "@/types/enums";
 import mongoose, { Document, Schema } from "mongoose";
-import Counter from "./Counter";
 
 interface OrderDocument extends Document {
   chatId: string;
   orderNumber: string;
   cusMsgId: number;
-  orderStatus: OrderStatus;
+  orderStatus: IOrderStatus;
   deliveryFee: number;
   subtotal: number;
   total: number;
   orderDetails: mongoose.Types.ObjectId[];
-  paymentMethod: string;
-  paymentStatus: PaymentStatus;
+  paymentMethod: IPaymentMethod;
+  paymentStatus: IPaymentStatus;
   phoneNumber: string;
   location: string;
   address: string;
@@ -27,17 +26,18 @@ const OrderSchema: Schema = new Schema(
     cusMsgId: { type: Number, required: false },
     orderStatus: {
       type: String,
-      enum: Object.values(OrderStatus),
-      default: OrderStatus.AWAITING_CONFIRM,
+      enum: Object.values(IOrderStatus),
+      default: IOrderStatus.PENDING,
     },
     paymentStatus: {
       type: String,
-      enum: Object.values(PaymentStatus),
-      default: PaymentStatus.PENDING,
+      enum: Object.values(IPaymentStatus),
+      default: IPaymentStatus.PENDING,
     },
     paymentMethod: {
       type: String,
-      required: false,
+      enum: Object.values(IPaymentMethod),
+      default: IPaymentMethod.DELIVERY,
     },
     deliveryFee: { type: Number, required: false },
     subtotal: { type: Number, required: false },

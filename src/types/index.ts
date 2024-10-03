@@ -1,5 +1,5 @@
 import { Context } from "telegraf";
-import { PaymentMethod } from "./enums";
+import { IOrderStatus, IPaymentStatus, PaymentMethod } from "./enums";
 
 export interface IOrderDetail {
   productId: string;
@@ -8,17 +8,19 @@ export interface IOrderDetail {
   price: number;
 }
 export interface IOrder {
-  chatId: number | null;
   queryId: string | null;
+  chatId: number | null;
   orderNumber?: string;
-  phoneNumber: string;
-  location: string;
-  address: string;
+  orderStatus?: IOrderStatus;
+  paymentStatus?: IPaymentStatus;
+  paymentMethod: PaymentMethod;
   deliveryFee: number;
   subtotal: number;
   total: number;
+  phoneNumber: string;
+  location: string;
+  address: string;
   orderDetails: IOrderDetail[];
-  paymentMethod: PaymentMethod;
 }
 
 export interface Customer {

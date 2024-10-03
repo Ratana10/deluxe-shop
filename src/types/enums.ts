@@ -1,3 +1,20 @@
+export enum IOrderStatus {
+  PENDING = "Pending",
+  CONFIRM = "Confrim",
+  REJECT = "Reject",
+}
+
+export enum IPaymentStatus {
+  PENDING = "Pending",
+  VERIFIED = "Verified",
+  REJECTED = "Rejected",
+}
+
+export enum IPaymentMethod {
+  DELIVERY = "Delivery",
+  BANK = "Bank",
+}
+
 export enum PaymentStatus {
   PENDING = "Pending",
   AWAITING_VERIIFY = "Awaiting_verify", // Customer has send the transaction
@@ -5,16 +22,16 @@ export enum PaymentStatus {
   REJECTED = "Rejected", // Ower has rejected the payment
 }
 
-export enum OrderStatus { 
-  AWAITING_CONFIRM = "Awaiting_confirm",  // Wait owner confirm the order
+export enum OrderStatus {
+  AWAITING_CONFIRM = "Awaiting_confirm", // Wait owner confirm the order
   AWAITING_PHONE = "Awaiting_phone", // Wait customer send the phone number
   AWAITING_LOCATION = "Awaiting_location", // Waiting customer send the location
-  AWAITING_DELIVERY = "Awaiting_delivery",  // Customer waiting the product
-  COMPLETED = "Completed",  // Customer received the product ordered
+  AWAITING_DELIVERY = "Awaiting_delivery", // Customer waiting the product
+  COMPLETED = "Completed", // Customer received the product ordered
   REJECTED = "Rejected", // Ower rejected the the product ordered
 }
 
-export enum PaymentMethod{
+export enum PaymentMethod {
   DELIVERY = "Delivery",
-  BANK = "Bank"
+  BANK = "Bank",
 }
