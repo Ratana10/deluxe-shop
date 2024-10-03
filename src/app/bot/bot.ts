@@ -4,12 +4,13 @@ import { IOrderStatus } from "@/types/enums";
 import dedent from "dedent";
 import {
   getOrderById,
+  getAllOrdersByChatId,
   updateOrderStatus,
   updateRejectedReason,
 } from "@/service/db/order.service";
 import { createUser } from "@/service/db/user.service";
-import { IUser } from "@/types";
-import { message } from 'telegraf/filters'
+import { IOrder, IUser } from "@/types";
+import { message } from "telegraf/filters";
 
 // Load environment variables from .env
 dotenv.config();
@@ -79,6 +80,52 @@ bot.command("contactus", async (ctx) => {
   );
 });
 
+bot.command("myorder", async (ctx) => {
+  await ctx.sendChatAction("typing");
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const chatId = ctx.from.id;
+  try {
+    // get orders
+    const orders: IOrder[] = await getAllOrdersByChatId(chatId);
+
+    if (!orders || orders.length === 0) {
+      await ctx.reply("You haven't placed any orders yet.");
+      return;
+    }
+
+    // Format the order details to send to the user
+    const orderDetails = orders
+      .map((order: IOrder) => {
+        const formattedItems = order.orderDetails
+          .map(
+            (item) =>
+              `- ${item.name} x${item.quantity} - $${
+                item.price * item.quantity
+              }`
+          )
+          .join("\n");
+
+        return dedent(`
+        Products:
+        ${formattedItems}
+       🛵 Delivery Fee: $${order.deliveryFee.toFixed(2)}
+       💵 Total: $${order.total.toFixed(2)}
+       📦 Order: ${order.orderNumber}
+       📅 Date: ${new Date(order.createdAt!).toLocaleString()}
+       📦 Status: ${order.orderStatus}
+       `);
+      })
+      .join("\n\n");
+
+    await ctx.reply(orderDetails);
+
+  } catch (error) {
+    console.error("Error fetching orders: ", error);
+    await ctx.reply("An error occurred while fetching your orders.");
+  }
+});
+
 bot.action(/confirm_order:(.+):(.+)/, async (ctx) => {
   const [chatId, orderId] = ctx.match.slice(1);
 
@@ -135,7 +182,7 @@ bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   pendingRejections.set(ctx.from.id, { chatId, orderId });
 });
 
-bot.on(message('text'), async (ctx) => {
+bot.on(message("text"), async (ctx) => {
   // Check if this user has a pending rejection reason
   const rejectionInfo = pendingRejections.get(ctx.from.id);
   if (rejectionInfo) {

@@ -105,7 +105,6 @@ export async function updateOrderStatus(
   if (!updatedOrder) {
     throw new Error("Order not found");
   }
-  
 }
 
 // Get ordered by ChatId
@@ -157,5 +156,17 @@ export const updateRejectedReason = async (orderId: string, reason: string) => {
 
   if (!updatedOrder) {
     throw new Error("Order not found");
+  }
+};
+
+export const getAllOrdersByChatId = async (chatId: number) => {
+  try {
+    const orders = await Order.find({ chatId }).populate(
+      "orderDetails"
+    );
+    return orders;
+  } catch (error) {
+    console.error("Error fetching orders by chatId: ", error);
+    throw new Error("Failed to fetch orders.");
   }
 };
