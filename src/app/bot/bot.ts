@@ -1,26 +1,15 @@
-import { Context, Markup, session, Telegraf } from "telegraf";
+import { Markup, session, Telegraf } from "telegraf";
 import dotenv from "dotenv";
-import { IOrderStatus, } from "@/types/enums";
+import { IOrderStatus } from "@/types/enums";
 import dedent from "dedent";
 import {
   getOrderById,
-  updateOrderPaymentStatus,
   updateOrderStatus,
   updateRejectedReason,
 } from "@/service/db/order.service";
 import { createUser } from "@/service/db/user.service";
 import { IUser } from "@/types";
-
-// Bot type
-export interface SessionData {
-  orderId?: string;
-  messageCount: number;
-}
-
-export interface CustomContext extends Context {
-  session: SessionData;
-  match?: RegExpExecArray;
-}
+import { message } from 'telegraf/filters'
 
 // Load environment variables from .env
 dotenv.config();
@@ -36,16 +25,10 @@ if (!BOT_TOKEN || !TELEGRAM_CHAT_ID) {
 
 console.log("BOT Starting...");
 
-const bot = new Telegraf<CustomContext>(BOT_TOKEN);
+const bot = new Telegraf(BOT_TOKEN);
 
 // Apply session middleware
 bot.use(session());
-
-bot.telegram.setMyCommands([
-  { command: "/start", description: "Start placing an order" },
-  { command: "/help", description: "Display the list of available command" },
-  { command: "/contactus", description: "Contact support for help" },
-]);
 
 bot.start(async (ctx) => {
   // Simulate typing to make it feel more interactive
@@ -66,14 +49,33 @@ bot.start(async (ctx) => {
 
   await ctx.reply(
     `Hello ${telegrafUser.first_name || "there"}! ⭐\nReady to place an order!!`
-    // Markup.inlineKeyboard([
-    //   [
-    //     Markup.button.url(
-    //       "Start Order",
-    //       "https://t.me/TestDeluxeKhBot?startapp"
-    //     ),
-    //   ],
-    // ])
+  );
+});
+bot.help((ctx) => {
+  ctx.reply(
+    dedent(`
+    Here are the available commands:
+
+    /start - Start interacting with the bot
+    /contactus - Contact the shop's owner for support
+    /help - Show this help message
+    `)
+  );
+});
+
+bot.command("contactus", async (ctx) => {
+  ctx.reply(
+    dedent(`
+    If you have any problems, 
+    please kindly direct message the shop's owner.
+    📱 Phone number: 061 664 996
+    `),
+    Markup.inlineKeyboard([
+      [
+        Markup.button.url("📸 Instagram", "https://instagram.com/yourprofile"),
+        Markup.button.url("💬 Telegram", "https://t.me/chanminea_sarann"),
+      ],
+    ])
   );
 });
 
@@ -133,7 +135,7 @@ bot.action(/reject_order:(.+):(.+)/, async (ctx) => {
   pendingRejections.set(ctx.from.id, { chatId, orderId });
 });
 
-bot.on("text", async (ctx) => {
+bot.on(message('text'), async (ctx) => {
   // Check if this user has a pending rejection reason
   const rejectionInfo = pendingRejections.get(ctx.from.id);
   if (rejectionInfo) {
@@ -165,37 +167,6 @@ bot.on("text", async (ctx) => {
       "Rejection reason recorded and customer has been notified."
     );
   }
-});
-
-bot.command("contactus", async (ctx) => {
-  await ctx.reply(
-    `
-    If you have any problems, please kindly direct message the shop's owner.
-    `,
-    {
-      parse_mode: "MarkdownV2",
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "📱 Phone number",
-              url: "tel:061664996", // No spaces in the phone number
-            },
-          ],
-          [
-            {
-              text: "📸 Instagram",
-              url: "https://instagram.com/yourInstagramHandle", // Replace with actual handle
-            },
-            {
-              text: "💬 Telegram",
-              url: "https://t.me/chanminea_sarann",
-            },
-          ],
-        ],
-      },
-    }
-  );
 });
 
 // Command broadcast
@@ -327,6 +298,7 @@ bot.command("broadcast", async (ctx) => {
 
 // Set the webhook only in production and avoid during build
 if (process.env.NODE_ENV === "production") {
+  process.env.WEBHOOK_URL;
   if (process.env.WEBHOOK_URL) {
     // Ensure this is only run once when the app is live
     bot.telegram
