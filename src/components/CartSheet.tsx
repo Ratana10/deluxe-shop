@@ -16,7 +16,6 @@ import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { CartItem } from "@/types";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const CartSheet = () => {
@@ -30,45 +29,6 @@ const CartSheet = () => {
     increaseQuantity,
     decreaseQuantity,
   } = useCart();
-
-  const onOrder = async () => {
-    const chatId = localStorage.getItem("chatId");
-
-    if (!cart || cart.length === 0) {
-      toast.error("Your cart is empty");
-      return;
-    }
-
-    const isConfirmed = window.confirm(
-      "Are you sure you want to place the order?"
-    );
-
-    if (!isConfirmed) {
-      return;
-    }
-
-    toast.promise(
-      fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cart, chatId }),
-      }).then(async (res) => {
-        if (res.ok) {
-          clearCart(); //Clear cart on success
-        } else {
-          throw new Error("Order fail");
-        }
-      }),
-      {
-        loading: "Loading ...",
-        success:
-          "Order Placed successfully\nPlease check your telegram notification",
-        error: "Order failed! Please try again.",
-      }
-    );
-  };
 
   return (
     <>
@@ -156,14 +116,6 @@ const CartSheet = () => {
                 ))}
               </ul>
             )}
-
-            {/* Delivery Price */}
-            <div className="mt-6 border-t pt-4">
-              <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Delivery</span>
-                <span>$ 2.00</span>{" "}
-              </div>
-            </div>
 
             {/* Total Price */}
             <div className="mt-6 border-t pt-4">
