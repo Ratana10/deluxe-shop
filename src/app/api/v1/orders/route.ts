@@ -6,8 +6,9 @@ import Order from "@/models/Order";
 import { IOrder, OrderDetail as IOrderDetail } from "@/types";
 import OrderDetail from "@/models/OrderDetail";
 import bot from "@/app/bot/bot";
-import { format } from "date-fns";
 import dedent from "dedent";
+import User from "@/models/User";
+import { formattedDate } from "@/utils/UtilFormat";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
     const yearMonth = new Date().toISOString().slice(0, 7).replace("-", ""); // e.g., 202409 for Sept 2024
     const orderNumber = `DELUXE${yearMonth}${String(seq).padStart(4, "0")}`; // e.g., DELUXE202409000
 
+    // get user
+    const user = await User.findOne({ chatId });
+
+    if (!user) {
+      throw new Error("user not found");
+    }
+
     const orderModel = new Order({
       chatId,
       orderNumber,
@@ -55,6 +63,7 @@ export async function POST(req: NextRequest) {
       location,
       address,
       orderDetails: [],
+      user: user._id,
     });
 
     console.log("orderModel", orderModel);
@@ -83,7 +92,7 @@ export async function POST(req: NextRequest) {
     if (!savedOrder) throw new Error("Failed to save order link to order.");
 
     // Send message to telegram
-    const currentDate = format(new Date(), "MM-dd-yyyy hh:mm:ss a");
+    const orderDate = formattedDate(new Date());
 
     const formattedCartItems = orderDetails
       .map(
@@ -107,7 +116,7 @@ export async function POST(req: NextRequest) {
       💵 Total: $${total.toFixed(2)}
       📦 Order: ${orderNumber}
       💳 Payment: ${paymentMethod}
-      📅 Date : ${currentDate}
+      📅 Date : ${orderDate}
       📞 phone: ${phoneNumber}
       📍 address: ${address}
         `
@@ -157,7 +166,7 @@ export async function POST(req: NextRequest) {
       💵 Total: $${total.toFixed(2)}
       📦 Order: ${orderNumber}
       💳 Payment: ${paymentMethod}
-      📅 Date : ${currentDate}
+      📅 Date : ${orderDate}
       📞 phone: ${phoneNumber}
       📍 address: ${address}
       🧭 location: ${location}

@@ -13,9 +13,9 @@ interface UserDocument extends Document {
 
 const UserSchema: Schema = new Schema(
   {
-    username: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    username: { type: String, required: false },
+    firstName: { type: String, required: false },
+    lastName: { type: String, required: false },
     chatId: { type: Number, required: true, unique: true },
     phoneNumber: { type: String, required: false },
     botUsed: { type: Number, default: 1 },

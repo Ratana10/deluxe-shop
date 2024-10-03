@@ -21,6 +21,18 @@ export interface IOrder {
   location: string;
   address: string;
   orderDetails: IOrderDetail[];
+  user?: IUser;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IUser {
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  chatId: number;
+  phoneNumber?: string;
+  botUsed: number;
 }
 
 export interface Customer {

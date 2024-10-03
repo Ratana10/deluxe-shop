@@ -2,7 +2,7 @@ import { IOrderStatus, IPaymentMethod, IPaymentStatus } from "@/types/enums";
 import mongoose, { Document, Schema } from "mongoose";
 
 interface OrderDocument extends Document {
-  chatId: string;
+  chatId: number;
   orderNumber: string;
   cusMsgId: number;
   orderStatus: IOrderStatus;
@@ -10,6 +10,7 @@ interface OrderDocument extends Document {
   subtotal: number;
   total: number;
   orderDetails: mongoose.Types.ObjectId[];
+  user: mongoose.Types.ObjectId;
   paymentMethod: IPaymentMethod;
   paymentStatus: IPaymentStatus;
   phoneNumber: string;
@@ -21,7 +22,7 @@ interface OrderDocument extends Document {
 
 const OrderSchema: Schema = new Schema(
   {
-    chatId: { type: String, required: true },
+    chatId: { type: Number, required: true },
     orderNumber: { type: String, required: false, unique: true },
     cusMsgId: { type: Number, required: false },
     orderStatus: {
@@ -46,6 +47,7 @@ const OrderSchema: Schema = new Schema(
     location: { type: String, required: false },
     address: { type: String, required: false },
     orderDetails: [{ type: mongoose.Types.ObjectId, ref: "OrderDetail" }],
+    user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
   },
   {
     timestamps: true,
