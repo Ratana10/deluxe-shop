@@ -3,12 +3,12 @@ import dotenv from "dotenv";
 import { IOrderStatus } from "@/types/enums";
 import dedent from "dedent";
 import {
+  getAllOrdersByUserId,
   getOrderById,
-  getAllOrdersByChatId,
   updateOrderStatus,
   updateRejectedReason,
 } from "@/service/db/order.service";
-import { createUser } from "@/service/db/user.service";
+import { createUser, getUserByChatId } from "@/service/db/user.service";
 import { IOrder, IUser } from "@/types";
 import { message } from "telegraf/filters";
 
@@ -18,9 +18,9 @@ dotenv.config();
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_LINK = process.env.NEXT_PUBLIC_API_BASE_URL;
 const WEBHOOK_URL = `${WEB_LINK}/api/webhook`;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const SHOP_GROUP_CHAT_ID = process.env.SHOP_GROUP_CHAT_ID;
 
-if (!BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+if (!BOT_TOKEN || !SHOP_GROUP_CHAT_ID) {
   throw new Error("TELEGRAM_BOT_TOKEN is required");
 }
 
@@ -46,12 +46,15 @@ bot.start(async (ctx) => {
     chatId: telegrafUser.id,
   };
 
+  console.log("telegram user", userData);
+
   await createUser(userData);
 
   await ctx.reply(
     `Hello ${telegrafUser.first_name || "there"}! ⭐\nReady to place an order!!`
   );
 });
+
 bot.help((ctx) => {
   ctx.reply(
     dedent(`
@@ -63,6 +66,10 @@ bot.help((ctx) => {
     `)
   );
 });
+
+// bot.on("message", (ctx) => {
+//   console.log(ctx.chat.id); // This will log the group `chatId` if the message is from a group
+// })
 
 bot.command("contactus", async (ctx) => {
   ctx.reply(
@@ -86,8 +93,17 @@ bot.command("myorder", async (ctx) => {
 
   const chatId = ctx.from.id;
   try {
+    const user = await getUserByChatId(chatId);
+
+    if (!user) {
+      await ctx.reply(
+        "You haven't placed any orders yet. Please start an order."
+      );
+      return;
+    }
+
     // get orders
-    const orders: IOrder[] = await getAllOrdersByChatId(chatId);
+    const orders: IOrder[] = await getAllOrdersByUserId(user._id);
 
     if (!orders || orders.length === 0) {
       await ctx.reply("You haven't placed any orders yet.");
@@ -96,7 +112,7 @@ bot.command("myorder", async (ctx) => {
 
     // Format the order details to send to the user
     const orderDetails = orders
-      .map((order: IOrder) => {
+      .map((order: IOrder, index: number) => {
         const formattedItems = order.orderDetails
           .map(
             (item) =>
@@ -107,19 +123,20 @@ bot.command("myorder", async (ctx) => {
           .join("\n");
 
         return dedent(`
-        Products:
-        ${formattedItems}
-       🛵 Delivery Fee: $${order.deliveryFee.toFixed(2)}
-       💵 Total: $${order.total.toFixed(2)}
-       📦 Order: ${order.orderNumber}
-       📅 Date: ${new Date(order.createdAt!).toLocaleString()}
-       📦 Status: ${order.orderStatus}
-       `);
+            Order ${index + 1}:
+            🛍️ Order ID: ${order.orderNumber}
+            📅 Date: ${new Date(order.createdAt!).toLocaleString()}
+            📦 Status: ${order.orderStatus}
+            Products:
+            ${formattedItems}
+            🛵 Delivery Fee: $${order.deliveryFee.toFixed(2)}
+            💵 Total: $${order.total.toFixed(2)}
+            ----
+            `);
       })
       .join("\n\n");
 
     await ctx.reply(orderDetails);
-
   } catch (error) {
     console.error("Error fetching orders: ", error);
     await ctx.reply("An error occurred while fetching your orders.");
@@ -218,7 +235,7 @@ bot.on(message("text"), async (ctx) => {
 
 // Command broadcast
 bot.command("broadcast", async (ctx) => {
-  const admin = process.env.TELEGRAM_CHAT_ID;
+  const admin = process.env.SHOP_GROUP_CHAT_ID;
 
   //Check admin
   if (String(ctx.from.id) === admin) {
@@ -282,7 +299,7 @@ bot.command("broadcast", async (ctx) => {
 //     await updateOrderPaymentStatus(orderId, PaymentStatus.AWAITING_VERIIFY);
 
 //     // Send the transaction photo to the seller for verification
-//     const owerChatId = process.env.TELEGRAM_CHAT_ID;
+//     const owerChatId = process.env.SHOP_GROUP_CHAT_ID;
 
 //     const order = await getOrderById(orderId);
 

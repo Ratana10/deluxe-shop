@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
     );
 
     await bot.telegram.sendMessage(
-      process.env.TELEGRAM_CHAT_ID!, // Seller's chat ID from environment variables
+      process.env.SHOP_GROUP_CHAT_ID!, // Seller's chat ID from environment variables
       sellerMessage,
       Markup.inlineKeyboard([
         [

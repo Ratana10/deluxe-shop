@@ -159,11 +159,9 @@ export const updateRejectedReason = async (orderId: string, reason: string) => {
   }
 };
 
-export const getAllOrdersByChatId = async (chatId: number) => {
+export const getAllOrdersByUserId = async (userId: number) => {
   try {
-    const orders = await Order.find({ chatId }).populate(
-      "orderDetails"
-    );
+    const orders = await Order.find({ user: userId }).populate("orderDetails");
     return orders;
   } catch (error) {
     console.error("Error fetching orders by chatId: ", error);

@@ -30,3 +30,14 @@ export async function createUser(user: IUser) {
   const savedUser = await newUser.save();
   console.log("test user", savedUser);
 }
+
+export async function getUserByChatId(chatId: number) {
+  try {
+    await connectMongoDB();
+    const user = await User.findOne({ chatId });
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by chatId: ", error);
+    throw new Error("Failed to fetch user.");
+  }
+}
