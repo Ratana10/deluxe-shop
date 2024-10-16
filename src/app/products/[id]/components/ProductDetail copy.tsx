@@ -11,14 +11,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"; // Shadcn Dialog
 import { Product } from "@/types";
 import BackButton from "@/components/BackButton";
 import { KeyboardEvent, useCallback, useEffect, useState } from "react";
@@ -66,8 +58,8 @@ const ProductDetail = ({ product }: Props) => {
       transition: {
         duration: 0.5,
         ease: "easeInOut",
-        when: "beforeChildren",
-        staggerChildren: 0.2,
+        when: "beforeChildren", // Ensures children animations start after container
+        staggerChildren: 0.2, // Stagger each child by 0.2s
       },
     },
     exit: { opacity: 0, scale: 0.9, transition: { duration: 0.3 } },
@@ -107,6 +99,7 @@ const ProductDetail = ({ product }: Props) => {
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
+      // Clean up the event listener on component unmount
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown]);
@@ -158,10 +151,7 @@ const ProductDetail = ({ product }: Props) => {
         </motion.div>
 
         {/* Product Details Section */}
-        <motion.div
-          variants={itemVariants}
-          className="flex-1 flex flex-col justify-center gap-6"
-        >
+        <motion.div variants={itemVariants} className="flex-1 flex flex-col justify-center gap-6">
           <div className="flex flex-col">
             {/* Product Name */}
             <h1 className="font-bold text-3xl sm:text-4xl text-[#660404]">
@@ -170,9 +160,7 @@ const ProductDetail = ({ product }: Props) => {
 
             {/* Product Description */}
             <div className="my-6">
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Description:
-              </h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold">Description:</h3>
               <p className="text-gray-600 text-md sm:text-lg">
                 {product.description}
               </p>
@@ -180,9 +168,7 @@ const ProductDetail = ({ product }: Props) => {
 
             {/*  Color Display */}
             <div className="">
-              <span className="text-lg sm:text-xl md:text-2xl font-bold">
-                Color:
-              </span>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold">Color:</span>
 
               <div className="flex items-center space-x-2">
                 {/* Display color name */}
@@ -197,6 +183,17 @@ const ProductDetail = ({ product }: Props) => {
                 ></span>
               </div>
             </div>
+
+            {/* Product Status */}
+            {/* <div className="mt-4">
+              <Badge
+                className={`${
+                  product.status === "Available" ? "bg-green-600" : "bg-red-500"
+                } text-white px-3 py-1 rounded-full`}
+              >
+                {product.status}
+              </Badge>
+            </div> */}
 
             {/* Separator */}
             <Separator className="my-4" />
@@ -218,41 +215,65 @@ const ProductDetail = ({ product }: Props) => {
                 Add To Cart
               </button>
             </div>
+
+            {/* Modal for Full-size Image */}
+            {isModalOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4"
+                onClick={closeModal} // Close modal when clicking outside the image
+              >
+                <div
+                  className="relative w-full max-w-4xl max-h-[90vh] overflow-auto"
+                  onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+                >
+                  {/* Carousel Inside Modal with Initial Index */}
+                  <Carousel
+                    className="w-full"
+                    opts={{ startIndex: currentIndex }}
+                  >
+                    <CarouselContent>
+                      {product.images.map((image: string, index: number) => (
+                        <CarouselItem
+                          key={index}
+                          className="relative h-[500px] md:h-[600px]"
+                        >
+                          <Image
+                            src={image}
+                            alt={product.name}
+                            fill
+                            className="object-contain"
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {/* Carousel Navigation Buttons in Modal */}
+                    <CarouselPrevious
+                      id="carousel-previous-modal"
+                      className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition"
+                    />
+                    <CarouselNext
+                      id="carousel-next-modal"
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition"
+                    />
+                  </Carousel>
+
+                  {/* Close Button */}
+                  <button
+                    className="absolute top-4 right-4 text-white text-5xl font-bold "
+                    onClick={closeModal}
+                  >
+                    &times;
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </div>
         </motion.div>
       </motion.div>
-
-      {/* Modal for Image Popup using Shadcn */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl p-0 bg-transparent shadow-none">
-          <Carousel className="w-full" opts={{ startIndex: currentIndex }}>
-            <CarouselContent>
-              {product.images.map((image: string, index: number) => (
-                <CarouselItem
-                  key={index}
-                  className="relative h-[500px] md:h-[600px]"
-                >
-                  <Image
-                    src={image}
-                    alt={product.name}
-                    fill
-                    className="object-contain"
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {/* Carousel Navigation Buttons in Modal */}
-            <CarouselPrevious
-              id="carousel-previous-modal"
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition"
-            />
-            <CarouselNext
-              id="carousel-next-modal"
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/50 text-black p-2 rounded-full hover:bg-white/70 transition"
-            />
-          </Carousel>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -13,7 +13,7 @@ import {
 import Navbar, { navbars } from "./Navbar";
 import CartSheet from "@/components/CartSheet";
 import { Menu } from "lucide-react";
-import { setting } from "@/db/setting";
+import Image from "next/image";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -38,12 +38,20 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-6 bg-white">
               <SheetHeader>
-                <SheetTitle className="text-center text-2xl font-bold text-[#660404]">
-                  {setting.logoName}
+                <SheetTitle className="flex items-center justify-center">
+                  <Link href="/" className="">
+                    <Image
+                      src="/img/logo.png"
+                      alt="Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain"
+                    />
+                  </Link>
                 </SheetTitle>
                 <SheetDescription className="mb-4 text-gray-500"></SheetDescription>
               </SheetHeader>
-              <nav className="mt-12">
+              <nav className="mt-10">
                 <ul className="space-y-6">
                   {navbars.map((nav) => (
                     <li key={nav.id}>
@@ -64,11 +72,14 @@ export default function Header() {
 
         {/* Logo */}
         <div className="flex items-center">
-          <Link
-            href="/"
-            className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#660404]"
-          >
-            {setting.logoName}
+          <Link href="/" className="">
+            <Image
+              src="/img/logo.png"
+              alt="Logo"
+              width={120}
+              height={120}
+              className="object-contain"
+            />
           </Link>
         </div>
 

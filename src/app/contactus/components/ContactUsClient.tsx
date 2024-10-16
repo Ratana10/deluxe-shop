@@ -1,41 +1,34 @@
 "use client";
 
 import { ContactUs } from "@/types";
-import { Facebook, Instagram, Mail, Map, Phone, Send } from "lucide-react";
+import { Facebook, Instagram, Send } from "lucide-react";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 
-const contactUs: ContactUs[] = [
+export const contactUs: ContactUs[] = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Facebook size={35} />,
+    href: "https://www.facebook.com/profile.php?id=61561814585184",
+    icon: <Facebook size={25} />,
     src: "/img/facebook.png",
   },
   {
     label: "Instagram",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Instagram size={35} />,
+    href: "https://www.instagram.com/de.luxeglam0ur?igsh=cWkzcW5pa2w4bHBs&utm_source=qr",
+    icon: <Instagram size={25} />,
     src: "/img/instagram.png",
   },
   {
-    label: "Phone",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Phone size={35} />,
-    src: "/img/phone.png",
-  },
-  {
     label: "Telegram",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Send size={35} />,
+    href: "https://t.me/chanminea_sarann",
+    icon: <Send size={25} />,
     src: "/img/telegram.png",
   },
-  {
-    label: "Mail",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Mail size={35} />,
-    src: "/img/mail.png",
-  },
 ];
+const DynamicIframe = dynamic(() => import("./MapIFrame"), {
+  loading: () => <p>Loading...</p>,
+  ssr: false,
+});
 
 const ContactUsClient = () => {
   return (
@@ -88,54 +81,26 @@ const ContactUsClient = () => {
       </div>
 
       {/* Text */}
-      <div className="text-center space-y-4 mt-6 md:mt-10 px-4 lg:px-8">
+      <div className="space-y-4 mt-6 md:mt-10 px-4 lg:px-8">
         <motion.h3
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-3xl  md:text-4xl font-bold mb-2 lg:md4 text-[#660404]"
+          className="text-center text-3xl  md:text-4xl font-bold mb-2 lg:md4 text-[#660404]"
         >
           Our Store Location
         </motion.h3>
 
-        <motion.p
-          initial={{ x: 100 }}
-          animate={{ x: 0 }}
-          transition={{ duration: 1 }}
-          className=" sm:text-lg mt-2 text-gray-600 max-w-3xl mx-auto text-center"
-        >
-          Visit our physical store in Phnom Penh for exclusive jewelry
-          collections and personalized service. We&apos; love to meet you in
-          personal
-        </motion.p>
-
-        <a
-          href="https://maps.app.goo.gl/f6P5jgj2Fokr9dFs9"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-[#AB8529] text-white px-3 py-2 rounded-md text-sm hover:bg-opacity-90 transition-all mt-4 lg:mt-6 inline-flex items-center  transform  duration-200 hover:scale-110"
-        >
-          <Map className="mr-2 h-4 w-4" />
-          View on Google Maps
-        </a>
-      </div>
-
-      {/* Button Section */}
-
-      {/* <div className="mt-12 text-center">
-        <h3 className="text-3xl md:text-4xl font-semibold mb-2">
-          Our Store Location
-        </h3>
-        <p className="text-lg mt-2 text-gray-600">Phnom Penh, Cambodia</p> */}
-      {/* <p className="text-lg text-gray-600">Open Hours: 10:00 AM - 7:00 PM</p> */}
-      {/* </div> */}
-
-      {/* Google Map */}
-      {/* <div className="mt-12 grid grid-cols-2">
-        <div className="flex justify-center">
-          
+        {/* Location Map */}
+        <div className="relative rounded-lg w-full h-[400px]  md:h-[550px] lg:h-[600px] mt-5">
+          <DynamicIframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d488.6437269789441!2d104.897564057517!3d11.54110881581258!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310950fe8609c59b%3A0x6621ba9a3538b878!2s12%2010MC%2C%20Phnom%20Penh!5e0!3m2!1sen!2skh!4v1729065610133!5m2!1sen!2skh"
+            width="100%"
+            height="80%"
+            style={{ border: 0 }}
+          />
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

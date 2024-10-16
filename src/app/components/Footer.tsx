@@ -1,38 +1,25 @@
-import Link from "next/link";
-import { Facebook, Twitter, Instagram, Phone, Send, Mail } from "lucide-react";
 import { ContactUs } from "@/types";
 import { setting } from "@/db/setting";
+import { Facebook, Instagram, Send } from "lucide-react";
 
-const contactUs: ContactUs[] = [
+export const contactUs: ContactUs[] = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/ratana.san.79/",
+    href: "https://www.facebook.com/profile.php?id=61561814585184",
     icon: <Facebook size={25} />,
     src: "/img/facebook.png",
   },
   {
     label: "Instagram",
-    href: "https://www.facebook.com/ratana.san.79/",
+    href: "https://www.instagram.com/de.luxeglam0ur?igsh=cWkzcW5pa2w4bHBs&utm_source=qr",
     icon: <Instagram size={25} />,
     src: "/img/instagram.png",
   },
   {
-    label: "Phone",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Phone size={25} />,
-    src: "/img/phone.png",
-  },
-  {
     label: "Telegram",
-    href: "https://www.facebook.com/ratana.san.79/",
+    href: "https://t.me/chanminea_sarann",
     icon: <Send size={25} />,
     src: "/img/telegram.png",
-  },
-  {
-    label: "Mail",
-    href: "https://www.facebook.com/ratana.san.79/",
-    icon: <Mail size={25} />,
-    src: "/img/mail.png",
   },
 ];
 
@@ -56,6 +43,7 @@ export default function Footer() {
               key={index}
               href={item.href}
               target="_blank"
+              rel="noopener noreferrer"
               className="text-lg font-medium  flex flex-col items-center transform transition duration-200 hover:scale-125"
             >
               {item.icon}
