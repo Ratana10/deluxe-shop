@@ -1,7 +1,6 @@
 "use client";
 
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import { Markazi_Text } from "next/font/google";
 import { useRef, useState } from "react";
 
 const containerStyle = {
@@ -10,8 +9,8 @@ const containerStyle = {
   margin: "auto",
 };
 const center = {
-  lat: -3.745,
-  lng: -38.523,
+  lat: 11.5604286,
+  lng: 104.9134571,
 };
 
 interface Props {

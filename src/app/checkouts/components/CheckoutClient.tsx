@@ -251,14 +251,14 @@ const CheckoutClient = () => {
                       </p>
                       <p className="text-sm">
                         Account Number: {" "}
-                        <span className="text-[#660404] font-semibold">1234567890</span>
+                        <span className="text-[#660404] font-semibold">003709135</span>
                       </p>
                       <p className="text-sm">
                         Account Link:
                         <span className="text-[#660404] font-semibold">
                           {" "}
                           <a
-                            href="https://pay.ababank.com/JC5nCa15DCHG4TXM8" // Replace with your actual account link
+                            href="https://pay.ababank.com/4YRP8dQXiLf7FwYG8" // Replace with your actual account link
                             className="text-blue-500 underline"
                             target="_blank"
                             rel="noopener noreferrer"

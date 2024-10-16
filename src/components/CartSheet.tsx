@@ -15,7 +15,6 @@ import Image from "next/image";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "@/app/context/CartContext";
 import { CartItem } from "@/types";
-import { toast } from "react-hot-toast";
 import Link from "next/link";
 
 const CartSheet = () => {
@@ -24,6 +23,7 @@ const CartSheet = () => {
   const {
     totalQuantity,
     totalAmount,
+    subtotalAmount,
     cart,
     clearCart,
     increaseQuantity,
@@ -121,7 +121,7 @@ const CartSheet = () => {
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total</span>
-                <span>${totalAmount.toFixed(2)}</span>{" "}
+                <span>${subtotalAmount.toFixed(2)}</span>
               </div>
             </div>
           </div>
