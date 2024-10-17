@@ -65,7 +65,7 @@ export function ProductCard({ product }: Props) {
                 : "bg-[#660404] text-white"
             }`}
           >
-            {product.status === "Available" ? "Available" : "Out of Stock"}
+            {product.status}
           </span>
         </div>
       </div>
