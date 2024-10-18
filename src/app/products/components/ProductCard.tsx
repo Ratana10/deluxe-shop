@@ -62,9 +62,9 @@ export function ProductCard({ product }: Props) {
             className={`ml-auto px-2 py-1 rounded-sm text-sm ${
               product.status === "Available"
                 ? "bg-[#AB8529] text-white"
-                : product.status === "Coming Soon"
-                ? "bg-gray-500 text-white"
-                : "bg-[#660404] text-white"
+                : product.status === "Unavailable"
+                ? "bg-[#660404] text-white"
+                : " bg-gray-500 text-white"
             }`}
           >
             {product.status}
