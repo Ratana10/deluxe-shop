@@ -8,6 +8,7 @@ import { CartProvider } from "./context/CartContext";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 import "leaflet/dist/leaflet.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -32,6 +33,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const GA_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID;
+
   return (
     <html lang="en">
       <head>
@@ -50,7 +53,8 @@ export default function RootLayout({
 
           {/* Main content area grows to fill available space, ensuring the footer stays at the bottom */}
           <main className="flex-grow mt-14">{children}</main>
-
+          {/* Google Analytic */}
+          {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
           {/* Footer with proper spacing */}
           <Footer />
         </CartProvider>
