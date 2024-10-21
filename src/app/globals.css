@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  overflow-y: scroll;
+}
+
+body {
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .overflow-unset {
+    overflow: unset !important;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
