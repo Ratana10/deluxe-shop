@@ -14,6 +14,17 @@ export function ProductCard({ product }: Props) {
   const ref = useRef(null);
   const inView = useInView(ref);
 
+  const getBannerColor = (status: string) => {
+    switch (status) {
+      case "Out of stock":
+        return "bg-[#660404] text-white";
+      case "Coming soon":
+        return "bg-gray-500 text-white";
+      default:
+        return "text-white";
+    }
+  };
+
   return (
     <motion.div
       ref={ref}
@@ -27,13 +38,25 @@ export function ProductCard({ product }: Props) {
       <Link href={`/products/${product.id}`}>
         <div className="relative w-full h-[300px] sm:h-[250px] md:h-[400px] lg:h-[300px] overflow-hidden rounded-lg shadow-sm">
           <Image
-            src={product.images[0] || ""}
+            src={product.images[0] || "/img/no-image.png"}
             alt={product.name}
             fill
             className="rounded-lg object-cover border"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority
           />
+          {(product.status === "Out of stock" ||
+            product.status === "Coming soon") && (
+            <div className="absolute inset-x-0 bottom-0 flex justify-center items-center overflow-hidden">
+              <div
+                className={`w-full opacity-50 text-lg font-bold px-6 py-3 text-center ${getBannerColor(
+                  product.status
+                )}`}
+              >
+                {product.status}
+              </div>
+            </div>
+          )}
         </div>
       </Link>
 
@@ -58,7 +81,8 @@ export function ProductCard({ product }: Props) {
           </span>
 
           {/* Stock Status */}
-          <span
+          {/* Banner for Out of Stock and Coming Soon */}
+          {/* <span
             className={`ml-auto px-2 py-1 rounded-sm text-sm ${
               product.status === "Available"
                 ? "bg-[#AB8529] text-white"
@@ -68,7 +92,7 @@ export function ProductCard({ product }: Props) {
             }`}
           >
             {product.status}
-          </span>
+          </span> */}
         </div>
       </div>
     </motion.div>

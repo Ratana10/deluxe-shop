@@ -111,8 +111,19 @@ const ProductDetail = ({ product }: Props) => {
     };
   }, [handleKeyDown]);
 
+  const getBannerColor = (status: string) => {
+    switch (status) {
+      case "Out of stock":
+        return "bg-[#660404] text-white";
+      case "Coming soon":
+        return "bg-gray-500 text-white";
+      default:
+        return "text-white";
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Back Button */}
       <BackButton text="Back" />
 
@@ -130,20 +141,48 @@ const ProductDetail = ({ product }: Props) => {
         >
           <Carousel className="w-full">
             <CarouselContent>
-              {product.images.map((image: string, index: number) => (
-                <CarouselItem
-                  key={index}
-                  className="relative h-[400px] md:h-[600px]"
-                  onClick={() => openModal(index)} // Open Modal on image click
-                >
+              {product.images && product.images.length > 0 ? (
+                product.images.map((image: string, index: number) => (
+                  <CarouselItem
+                    key={index}
+                    className="relative h-[400px] md:h-[600px]"
+                    onClick={() => openModal(index)} // Open Modal on image click
+                  >
+                    <Image
+                      src={image}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                    {(product.status === "Out of stock" ||
+                      product.status === "Coming soon") && (
+                      <div className="absolute inset-x-0 bottom-0 flex justify-center items-center overflow-hidden">
+                        <div
+                          className={`w-full opacity-50 text-lg font-bold px-6 py-3 text-center ${getBannerColor(
+                            product.status
+                          )}`}
+                        >
+                          {product.status}
+                        </div>
+                      </div>
+                    )}
+                  </CarouselItem>
+                ))
+              ) : (
+                <CarouselItem className="relative h-[400px] md:h-[600px]">
                   <Image
-                    src={image}
-                    alt={product.name}
+                    src="/img/no-image.png"
+                    alt="Default Product"
                     fill
                     className="object-cover"
                   />
+                  <div className="absolute inset-x-0 bottom-0 flex justify-center items-center overflow-hidden">
+                    <div className="w-full text-lg font-bold px-6 py-3 text-center bg-gray-500 text-white">
+                      Default Product
+                    </div>
+                  </div>
                 </CarouselItem>
-              ))}
+              )}
             </CarouselContent>
             {/* Carousel Navigation Buttons */}
             <CarouselPrevious
@@ -212,8 +251,17 @@ const ProductDetail = ({ product }: Props) => {
                 </span>
               </Label>
               <button
-                className="btn-primary"
+                className={`btn-primary ${
+                  product.status === "Out of stock" ||
+                  product.status === "Coming soon"
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
                 onClick={() => onAddToCart(product)}
+                disabled={
+                  product.status === "Out of stock" ||
+                  product.status === "Coming soon"
+                } // Disable button when product is Out of stock or Coming soon
               >
                 Add To Cart
               </button>
@@ -227,19 +275,20 @@ const ProductDetail = ({ product }: Props) => {
         <DialogContent className="max-w-4xl p-0 bg-transparent shadow-none">
           <Carousel className="w-full" opts={{ startIndex: currentIndex }}>
             <CarouselContent>
-              {product.images.map((image: string, index: number) => (
-                <CarouselItem
-                  key={index}
-                  className="relative h-[500px] md:h-[600px]"
-                >
-                  <Image
-                    src={image}
-                    alt={product.name}
-                    fill
-                    className="object-contain"
-                  />
-                </CarouselItem>
-              ))}
+              {product.images.length > 0 &&
+                product.images.map((image: string, index: number) => (
+                  <CarouselItem
+                    key={index}
+                    className="relative h-[500px] md:h-[600px]"
+                  >
+                    <Image
+                      src={image}
+                      alt={product.name}
+                      fill
+                      className="object-contain"
+                    />
+                  </CarouselItem>
+                ))}
             </CarouselContent>
             {/* Carousel Navigation Buttons in Modal */}
             <CarouselPrevious
